@@ -40,6 +40,8 @@ In particular, we can get very confused by /* and // inside strings!
 We do a small hack, which is to ignore //'s with "'s after them on the
 same line, but it is far from perfect (in either direction).
 """
+# We disable pylint for this file as it is external.
+#pylint: skip-file
 
 import codecs
 import copy
