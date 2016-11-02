@@ -4,9 +4,9 @@
 """ Simple git pre-commit script for executing some linters. """
 
 import commands
-import subprocess
 import imp
 import re
+import pylint.lint
 
 
 def check_cpp_lint(repo_root, staged_files):
@@ -42,13 +42,46 @@ def check_modified_after_staging(staged_files):
 
 def check_python_lint(repo_root, staged_files):
     """Runs pylint on all python scripts staged for commit."""
+
+    # Dummy class for pylint related IO.
+    class WritableObject(object):
+        "dummy output stream for pylint"
+
+        def __init__(self):
+            self.content = []
+
+        def write(self, st):
+            "dummy write"
+            self.content.append(st)
+
+        def read(self):
+            "dummy read"
+            return self.content
+
+    # Parse each pylint output line individualy and searches
+    # for errors in the code.
+    pylint_errors = []
     for changed_file in staged_files:
         if re.search(r'\.py$', changed_file):
-            pylint_output = subprocess.check_output(
-                "pylint --rcfile=" + repo_root +
-                "/devtools/pylint.rc --errors-only " + repo_root + "/" +
-                changed_file, stderr=None, shell=True)
-            #TODO(igor): Actually process pylint_output
+
+            print "Running pylint on " + repo_root + "/" + changed_file
+            pylint_output = WritableObject()
+            pylint_args = ["--rcfile=" + repo_root + "/devtools/pylint.rc",
+                           "-rn", "--errors-only",
+                           repo_root + "/" + changed_file]
+            from pylint.reporters.text import TextReporter
+            pylint.lint.Run(pylint_args,
+                            reporter=TextReporter(pylint_output),
+                            exit=False)
+
+            for l in pylint_output.read():
+                if re.search(r'^E:', l):
+                    print changed_file + ": " + l
+                    pylint_errors.append(l)
+
+    if len(pylint_errors) > 0:
+        print  "Pylint found errors. Terminating."
+        exit(len(pylint_errors))
 
 def main():
     """ Checks for staged files and executes cpplint on them. """
