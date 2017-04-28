@@ -40,8 +40,6 @@ In particular, we can get very confused by /* and // inside strings!
 We do a small hack, which is to ignore //'s with "'s after them on the
 same line, but it is far from perfect (in either direction).
 """
-# We disable pylint for this file as it is external.
-#pylint: skip-file
 
 import codecs
 import copy
@@ -171,8 +169,8 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
     The "root" option is similar in function to the --root flag (see example
     above).
-
-    The "headers" option is similar in function to the --headers flag
+    
+    The "headers" option is similar in function to the --headers flag 
     (see example above).
 
     CPPLINT.cfg has an effect on files in the same directory and all
@@ -2781,7 +2779,8 @@ def CheckForNonStandardConstructs(filename, clean_lines, linenum,
   # Look for single-argument constructors that aren't marked explicit.
   # Technically a valid construct, but against style.
   explicit_constructor_match = Match(
-      r'\s+(?:inline\s+)?(explicit\s+)?(?:inline\s+)?%s\s*'
+      r'\s+(?:(?:inline|constexpr)\s+)*(explicit\s+)?'
+      r'(?:(?:inline|constexpr)\s+)*%s\s*'
       r'\(((?:[^()]|\([^()]*\))*)\)'
       % re.escape(base_classname),
       line)
@@ -5842,9 +5841,7 @@ def ProcessFileData(filename, file_extension, lines, error,
 
   ResetNolintSuppressions()
 
-  #Refill Specific: Checks for existance of Copyright headers disabled
-  #and will be re-enabled once code is made available to the public.
-  #CheckForCopyright(filename, lines, error)
+  CheckForCopyright(filename, lines, error)
   ProcessGlobalSuppresions(lines)
   RemoveMultiLineComments(filename, lines, error)
   clean_lines = CleansedLines(lines)
