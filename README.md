@@ -10,7 +10,7 @@ TODOs:
  - [ ] Don't format merge commit changes
  - [ ] Make generic and/or provide environment variables to adapt to repo
  - [ ] Add to repos and test it:
-       - [ ] maplab
-       - [ ] voxblox
-       - [ ] turtlebot_navigation
-       - [ ] refill
+   - [ ] maplab
+   - [ ] voxblox
+   - [ ] turtlebot_navigation
+   - [ ] refill
