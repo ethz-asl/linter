@@ -49,6 +49,8 @@ def main():
   if subprocess.call("cp " + cp_params, shell=True) != 0:
     print("Failed to copy githooks to {}...".format((repo_root + "/.git/hooks/")))
 
+  print("Success!")
+
 
 if __name__ == "__main__":
   main()
