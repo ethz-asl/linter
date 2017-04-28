@@ -13,7 +13,7 @@ import pylint.lint
 def run_command_in_folder(command, folder):
   run_command = subprocess.Popen(command,
                                  shell=True,
-                                 cwd=some_folder_in_root_repo,
+                                 cwd=folder,
                                  stdin=subprocess.PIPE,
                                  stdout=subprocess.PIPE)
   stdout, stderr = run_command.communicate()
@@ -21,11 +21,11 @@ def run_command_in_folder(command, folder):
 
   print("Parent git repo root folder: \'{}\'".format(command_output))
 
-  return outputcommand_
+  return command_output
 
 
 def get_root_git_repo(some_folder_in_root_repo='./'):
-  return run_command_in_folder('git', 'rev-parse', '--show-toplevel', some_folder_in_root_repo)
+  return run_command_in_folder('git rev-parse --show-toplevel', some_folder_in_root_repo)
 
 
 def get_linter_subfolder(some_folder_in_root_repo='./'):
@@ -34,6 +34,11 @@ def get_linter_subfolder(some_folder_in_root_repo='./'):
 
 def get_staged_files(some_folder_in_root_repo='./'):
   output = run_command_in_folder("git diff --staged --name-only", some_folder_in_root_repo)
+  return output.split("\n")
+
+
+def get_unstaged_files(some_folder_in_root_repo='./'):
+  output = run_command_in_folder("git diff --name-only", some_folder_in_root_repo)
   return output.split("\n")
 
 
@@ -61,8 +66,7 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file):
 
 def check_modified_after_staging(staged_files):
   """Checks if one of the staged files was modified after staging."""
-  _, unstaged_changes = commands.getstatusoutput('git diff --name-only')
-  files_changed = unstaged_changes.split("\n")
+  files_changed = get_unstaged_files()
   files_changed = filter(None, files_changed)
 
   staged_files_changed = 0
