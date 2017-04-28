@@ -20,14 +20,25 @@ def download_file_from_url(url, file_path):
 
 
 def main():
-  """ Download cpplint.py and pylint.py """
+  """ Download cpplint.py and pylint.py and installs the git hooks"""
+
+  # Download linter files.
   download_file_from_url(cpplint_url, "cpplint.py")
   download_file_from_url(pylint_url, "pylint.rc")
 
-  """ Copies pre-commit script to git hooks folder. """
-  _, repo_root = commands.getstatusoutput('git rev-parse --show-toplevel')
+  # Get git root folder of parent repository.
+  get_repo_call = subprocess.Popen(['git rev-parse --show-toplevel'],
+                                   cwd='../', stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+  repo_root, return_code = get_repo_call.comunicate()
+  assert return_code == 0
+
+  print("Found parent git repo root folder: {}".format(repo_root))
+
+  # Copy git hooks.
   cp_params = repo_root + "/linter/pre-commit " + repo_root + "/.git/hooks/"
-  subprocess.call("cp " + cp_params, shell=True)
+  assert subprocess.call("cp " + cp_params, shell=True) == 0
 
 
 if __name__ == "__main__":
