@@ -129,12 +129,13 @@ def main():
   repo_root = get_root_git_repo()
 
   # Get linter subfolder
-  linter_subfolder = get_linter_subfolder()
+  linter_subfolder = get_linter_subfolder(repo_root)
 
   cpplint_file = repo_root + "/" + linter_subfolder + "/cpplint.py"
   pylint_file = repo_root + "/" + linter_subfolder + "/pylint.rc"
 
   # TODO(mfehr): remove this
+  print("Found linter subfolder: {}".format(linter_subfolder))
   print("Found cpplint file at: {}".format(cpplint_file))
   print("Found pylint file at: {}".format(pylint_file))
 
