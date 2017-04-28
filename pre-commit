@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # Disable pylint invalid module name complaint.
 # pylint: disable=C0103
+
 """ Pre Commit script for invoking linters."""
 
 import imp
@@ -8,6 +11,17 @@ import subprocess
 import imp
 import re
 import pylint.lint
+
+import codecs
+import copy
+import getopt
+import math  # for log
+import os
+import re
+import sre_compile
+import string
+import sys
+import unicodedata
 
 
 def run_command_in_folder(command, folder):
@@ -39,9 +53,9 @@ def get_unstaged_files(some_folder_in_root_repo='./'):
   return output.split("\n")
 
 
-def check_cpp_lint(repo_root, staged_files, cpplint_file):
+def check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art):
   """Runs Google's cpplint on all C++ files staged for commit,"""
-  cpplint = imp.load_source('cpplint.py', cpplint_file)
+  cpplint = imp.load_source('cpplint', cpplint_file)
   for changed_file in staged_files:
     if re.search(r'\.cc$', changed_file):
       changed_file = repo_root + "/" + changed_file
@@ -57,8 +71,10 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file):
       cpplint._root = None  # pylint: disable=W0212
 
   if cpplint._cpplint_state.error_count:  # pylint: disable=W0212
-    print 'Aborting commit: cpplint is unhappy.'
+    print(ascii_art.AsciiArt.zen_ascii_art_reject)
     exit(cpplint._cpplint_state.error_count)  # pylint: disable=W0212
+  else:
+    print(ascii_art.AsciiArt.zen_ascii_art)
 
 
 def check_modified_after_staging(staged_files):
@@ -133,6 +149,7 @@ def main():
 
   cpplint_file = repo_root + "/" + linter_subfolder + "/cpplint.py"
   pylint_file = repo_root + "/" + linter_subfolder + "/pylint.rc"
+  ascii_art_file = repo_root + "/" + linter_subfolder + "/ascii_art.py"
 
   # TODO(mfehr): remove this
   print("Found linter subfolder: {}".format(linter_subfolder))
@@ -142,12 +159,15 @@ def main():
   # Run checks
   staged_files = get_staged_files()
 
+  # Load ascii art.
+  ascii_art = imp.load_source('ascii_art', ascii_art_file)
+
   # Do not allow commiting files that were modified after staging. This
   # avoids problems such as forgetting to stage fixes of cpplint complaints.
   # check_modified_after_staging(staged_files)
 
   # Use Google's C++ linter to check for compliance with Google style guide.
-  check_cpp_lint(repo_root, staged_files, cpplint_file)
+  check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art)
 
   # Use pylint to check for comimpliance with Tensofrflow python style guide.
   check_python_lint(repo_root, staged_files, pylint_file)
