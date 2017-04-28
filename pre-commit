@@ -18,9 +18,6 @@ def run_command_in_folder(command, folder):
                                  stdout=subprocess.PIPE)
   stdout, stderr = run_command.communicate()
   command_output = stdout.rstrip()
-
-  print("Parent git repo root folder: \'{}\'".format(command_output))
-
   return command_output
 
 
@@ -44,7 +41,7 @@ def get_unstaged_files(some_folder_in_root_repo='./'):
 
 def check_cpp_lint(repo_root, staged_files, cpplint_file):
   """Runs Google's cpplint on all C++ files staged for commit,"""
-  cpplint = imp.load_source('cpplint', cpplint_file)
+  cpplint = imp.load_source('cpplint.py', cpplint_file)
   for changed_file in staged_files:
     if re.search(r'\.cc$', changed_file):
       changed_file = repo_root + "/" + changed_file

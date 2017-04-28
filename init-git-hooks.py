@@ -29,9 +29,6 @@ def get_root_git_repo(some_folder_in_root_repo='./'):
 
   stdout, stderr = get_repo_call.communicate()
   repo_root = stdout.rstrip()
-
-  print("Parent git repo root folder: \'{}\'".format(repo_root))
-
   return repo_root
 
 
