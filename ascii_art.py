@@ -4,7 +4,7 @@
 
 class AsciiArt(object):
 
-  zen_ascii_art = """
+  zen_success = """
             d888888b                         d888888b
          d888    8888b                    d888888   888b
        d88    88  898888b               d8888  888     88b
@@ -26,7 +26,7 @@ class AsciiArt(object):
 
   """
 
-  grumpy_cat_asci_art = """
+  grumpy_cat = """
         ▌─────────────────────────▐█─────▐
         ▌────▄──────────────────▄█▓█▌────▐
         ▌───▐██▄───────────────▄▓░░▓▓────▐
@@ -66,13 +66,10 @@ class AsciiArt(object):
         ██████████████████████████████████
 
 
-        "Your worst enemy cannot harm you as much as your own despicable code."
-
-        -- Budda (sort of)
-
+        Never commit directly to master!
   """
 
-  zen_ascii_art_reject = """
+  zen_errors = """
 
         "Your worst enemy cannot harm you as much as your own buggy code."
 

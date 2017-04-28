@@ -71,10 +71,10 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art):
       cpplint._root = None  # pylint: disable=W0212
 
   if cpplint._cpplint_state.error_count:  # pylint: disable=W0212
-    print(ascii_art.AsciiArt.zen_ascii_art_reject)
+    print(ascii_art.AsciiArt.zen_errors)
     exit(cpplint._cpplint_state.error_count)  # pylint: disable=W0212
   else:
-    print(ascii_art.AsciiArt.zen_ascii_art)
+    print(ascii_art.AsciiArt.zen_success)
 
 
 def check_modified_after_staging(staged_files):
@@ -111,6 +111,15 @@ def check_python_lint(repo_root, staged_files, pylint_file):
     def read(self):
       "dummy read"
       return self.content
+
+
+def check_commit_against_master(repo_root, ascii_art):
+  current_branch = run_command_in_folder("git branch | grep \"*\" | sed \"s/* //\"", repo_root)
+
+  if current_branch == "master:":
+    print(ascii_art.AsciiArt.grumpy_cat)
+    exit(1)
+  return
 
   # Parse each pylint output line individualy and searches
   # for errors in the code.
@@ -161,6 +170,8 @@ def main():
 
   # Load ascii art.
   ascii_art = imp.load_source('ascii_art', ascii_art_file)
+
+  check_commit_against_master(repo_root, ascii_art)
 
   # Do not allow commiting files that were modified after staging. This
   # avoids problems such as forgetting to stage fixes of cpplint complaints.
