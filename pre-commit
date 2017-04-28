@@ -117,7 +117,8 @@ def check_commit_against_master(repo_root, ascii_art):
   current_branch = run_command_in_folder("git branch | grep \"*\" | sed \"s/* //\"", repo_root)
 
   if current_branch == "master:":
-    print(ascii_art.AsciiArt.grumpy_cat)
+    # print(ascii_art.AsciiArt.grumpy_cat)
+    print(ascii_art.AsciiArt.angry_monkey)
     exit(1)
   return
 
