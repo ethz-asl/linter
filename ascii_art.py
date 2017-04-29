@@ -27,47 +27,52 @@ class AsciiArt(object):
   """
 
   grumpy_cat = """
-        ▌─────────────────────────▐█─────▐
-        ▌────▄──────────────────▄█▓█▌────▐
-        ▌───▐██▄───────────────▄▓░░▓▓────▐
-        ▌───▐█░██▓────────────▓▓░░░▓▌────▐
-        ▌───▐█▌░▓██──────────█▓░░░░▓─────▐
-        ▌────▓█▌░░▓█▄███████▄███▓░▓█─────▐
-        ▌────▓██▌░▓██░░░░░░░░░░▓█░▓▌─────▐
-        ▌─────▓█████░░░░░░░░░░░░▓██──────▐
-        ▌─────▓██▓░░░░░░░░░░░░░░░▓█──────▐
-        ▌─────▐█▓░░░░░░█▓░░▓█░░░░▓█▌─────▐
-        ▌─────▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌─────▐
-        ▌─────▓▓░▓██████▓░▓███▓▓▌░█▓─────▐
-        ▌────▐▓▓░█▄▐▓▌█▓░░▓█▐▓▌▄▓░██─────▐
-        ▌────▓█▓░▓█▄▄▄█▓░░▓█▄▄▄█▓░██▌────▐
-        ▌────▓█▌░▓█████▓░░░▓███▓▀░▓█▓────▐
-        ▌───▐▓█░░░▀▓██▀░░░░░─▀▓▀░░▓█▓────▐
-        ▌───▓██░░░░░░░░▀▄▄▄▄▀░░░░░░▓▓────▐
-        ▌───▓█▌░░░░░░░░░░▐▌░░░░░░░░▓▓▌───▐
-        ▌───▓█░░░░░░░░░▄▀▀▀▀▄░░░░░░░█▓───▐
-        ▌──▐█▌░░░░░░░░▀░░░░░░▀░░░░░░█▓▌──▐
-        ▌──▓█░░░░░░░░░░░░░░░░░░░░░░░██▓──▐
-        ▌──▓█░░░░░░░░░░░░░░░░░░░░░░░▓█▓──▐
-        ▌──██░░░░░░░░░░░░░░░░░░░░░░░░█▓──▐
-        ▌──█▌░░░░░░░░░░░░░░░░░░░░░░░░▐▓▌─▐
-        ▌─▐▓░░░░░░░░░░░░░░░░░░░░░░░░░░█▓─▐
-        ▌─█▓░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓─▐
-        ▌─█▓░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓▌▐
-        ▌▐█▓░░░░░░░░░░░░░░░░░░░░░░░░░░░██▐
-        ▌█▓▌░░░░░░░░░░░░░░░░░░░░░░░░░░░▓█▐
-        ██████████████████████████████████
-        █░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█
-        █░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█
-        █░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█
-        █░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█
-        █░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█
-        █░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█
-        ██████████████████████████████████
 
+                                                 :sdMMm+
+                                              /mMMMMMMM+
+    /Mms-                                   -mMMMMMMdsMm
+    .NMMMd:                               `yMMMMMmdM+ sM`
+     oMNmMMmo-        `.-::::::-.`       +NMMMMmo:mM--hM`
+      sMNmmMMMh//+++++/:-......-:/osyo/sNMMMmyo+-..yNMMN
+       hNmNmys+/                     :ooyNMMd:    `-MMMy
+       `mMms         `                   .ohNo:` .+NMMm`
+        :MMh  .../:+yy   -  :/              ./hMhhmNMM:
+        -NN`-yMMMMMMh-h :M:+MMh/.             .hMMMNdd
+       -NMMNMMMMMMMM:dd oMMMMMMMN.             oMMMMNs
+      .NMMMMNNMMMMMN``  /MMMMMMMMmys+/+/.      :MMMMNo
+      sMMMM++N.-dMMN`   -MMMMMm/dm-:yMMMNs-     .oNMM:
+      NMMMMo-s.:dMN:     /MMMM: +h``hMMMMMMy      `hM+
+     `MMMMMMMMMMMms+/.   -NMMMNhsoyNMMMMMMy`       oMM`
+     -dmMMMMMMdo.dMMMMh`  .hMMMMMMMMMMMMMM+        -MM`
+     -MNdddh/`    -yMy.     .+hNMMMMMMMMMMN         hM-
+     .dmmmd`   -shyoooyys/     `:hMMMMMMMN/         :Ms
+     `MMNdy   +d-        :y.     `ydddddo`           dN`
+      ydmNM+  m`          `y:     /dddds             :M/
+     `MMMMMMmh+`            /:   +dddNMm-             dd
+      MMMMMMMMh:             -smNMMMMmdds             -M.
+     `MMMMMMMMMMms+/--..--      ./oyyys+`              my
+     -MMMMMMMMMMMMNhoo+/:.                             sM-
+     /MMMMMMMMMMMMMMNy+:---`                           `mm`
+     oMMMMMMMMMMMNMMMNMMMMm:                            -Nh`
+     sMMMMMMMMMMNds.` `...                               :My
+     mMMMMMMMMMMy/`                                       /Mo
+    :MMMMMMMMMMMMMNy`                                      +M-
+   .mMMMMMMMMMNdhy--                                        dh
+  -NMMMMMMMMMMMMMMMMNyo.                                    :M
 
-        Never commit directly to master!
-  """
+    oMMN/     hMMs  -yNMMMMMMMMh/  .MMMMMMMMMNs`dMMMMMMMMMM.
+    oMMMMy`   hMMs`yMMMh+:-:/yNMMd..MMMs:::+mMMdmMMh:::::::`
+    oMMMMMm-  hMMsyMMm-       `hMMm-MMM/    -MMMMMMy
+    oMMmyMMM+ hMMdMMM:         `NMMoMMM/```-yMMNmMMNmmmmmmm`
+    oMMd /NMMhdMMhMMM/         `NMMoMMMMMMMMMMd-dMMNmmmmmmd`
+    oMMd  .dMMMMMsyMMN:       .hMMm.MMMhssss+-  dMMy
+    oMMd    sMMMMs sMMMdo/::+hMMMd..MMM/        dMMd///////`
+    oMMd     :NMMs  -yNMMMMMMMMh:  .MMM/        dMMMMMMMMMM-
+    .//:      `//-     .:+++/-      :::`        ://////////`
+
+    Never commit directly to master!
+
+"""
 
   zen_errors = """
 
