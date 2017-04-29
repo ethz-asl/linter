@@ -6,20 +6,19 @@
 
 """ Pre Commit script for invoking linters."""
 
-import imp
-import subprocess
-import imp
-import re
-import pylint.lint
-
 import codecs
 import copy
 import getopt
+import imp
+import imp
 import math  # for log
 import os
+import pylint.lint
+import re
 import re
 import sre_compile
 import string
+import subprocess
 import sys
 import unicodedata
 
@@ -94,6 +93,20 @@ def check_modified_after_staging(staged_files):
     exit(1)
 
 
+def check_commit_against_master(repo_root, ascii_art):
+  current_branch = run_command_in_folder("git branch | grep \"*\" | sed \"s/* //\"", repo_root)
+  print("Current_branch: {}".format(current_branch))
+  if current_branch == "master":
+    print(ascii_art.AsciiArt.grumpy_cat)
+    exit(1)
+  return
+
+
+def check_if_merge_commit(repo_root):
+  merge_msg_file_path = repo_root + "/.git/MERGE_MSG"
+  return os.path.isfile(merge_msg_file_path)
+
+
 def check_python_lint(repo_root, staged_files, pylint_file):
   """Runs pylint on all python scripts staged for commit."""
 
@@ -111,16 +124,6 @@ def check_python_lint(repo_root, staged_files, pylint_file):
     def read(self):
       "dummy read"
       return self.content
-
-
-def check_commit_against_master(repo_root, ascii_art):
-  current_branch = run_command_in_folder("git branch | grep \"*\" | sed \"s/* //\"", repo_root)
-
-  if current_branch == "master:":
-    # print(ascii_art.AsciiArt.grumpy_cat)
-    print(ascii_art.AsciiArt.angry_monkey)
-    exit(1)
-  return
 
   # Parse each pylint output line individualy and searches
   # for errors in the code.
