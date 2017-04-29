@@ -177,15 +177,20 @@ def main():
 
   check_commit_against_master(repo_root, ascii_art)
 
-  # Do not allow commiting files that were modified after staging. This
-  # avoids problems such as forgetting to stage fixes of cpplint complaints.
-  # check_modified_after_staging(staged_files)
+  if not check_if_merge_commit(repo_root):
+    # Do not allow commiting files that were modified after staging. This
+    # avoids problems such as forgetting to stage fixes of cpplint complaints.
+    # check_modified_after_staging(staged_files)
 
-  # Use Google's C++ linter to check for compliance with Google style guide.
-  check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art)
+    # TODO(mfehr): add clang formatter here.
 
-  # Use pylint to check for comimpliance with Tensofrflow python style guide.
-  check_python_lint(repo_root, staged_files, pylint_file)
+    # Use Google's C++ linter to check for compliance with Google style guide.
+    check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art)
+
+    # Use pylint to check for comimpliance with Tensofrflow python style guide.
+    check_python_lint(repo_root, staged_files, pylint_file)
+  else:
+    print(ascii_art.AsciiArt.homer_woohoo)
 
 
 if __name__ == "__main__":
