@@ -7,7 +7,7 @@ git add submodule git@github.com:ethz-asl/linter.git
 ./linter/init-git-hooks.py
 ```
 
-You can add the linter submodule in a subfolder of your repo, e.g.:
+You can also add the linter submodule in a subfolder of your repo, e.g.:
 ```bash
 mkdir $YOUR_REPO/dev_tools
 cd  $YOUR_REPO/dev_tools
@@ -17,10 +17,8 @@ git add submodule git@github.com:ethz-asl/linter.git
 
 The following git hooks are installed:
  * cpp files:
-   * clang-formatter
    * cpplint
  * python files:
-   * pep8 formatter
    * pylint
 
 TODOs:
