@@ -21,6 +21,14 @@ The following git hooks are installed:
  * python files:
    * pylint
 
+Dependencies:
+ * **autopep8** ([Introduction to autopep8](http://avilpage.com/2015/05/automatically-pep8-your-python-code.html))
+   * Ubuntu: `pip install autopep8`
+   * OSX: **TODO**
+ * **clang-format**
+   * Ubuntu: `sudo apt-get install clang-format-3.X`
+   * OSX: **TODO**
+
 TODOs:
  - [ ] Add clang formatter
  - [ ] Add yapf/pep formatter for python

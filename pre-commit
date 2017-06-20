@@ -112,6 +112,18 @@ def check_if_merge_commit(repo_root):
   return os.path.isfile(merge_msg_file_path)
 
 
+def run_clang_format(repo_root, staged_files):
+  """Runs clang format on all cpp files staged for commit."""
+  # TODO(mfehr): IMPLEMENT
+  return True
+
+
+def run_autopep8_format(repo_root, staged_files):
+  """Runs autopep8 format on all python files staged for commit."""
+  # TODO(mfehr): IMPLEMENT
+  return True
+
+
 def check_python_lint(repo_root, staged_files, pylint_file):
   """Runs pylint on all python scripts staged for commit."""
 
@@ -190,7 +202,14 @@ def main():
     # avoids problems such as forgetting to stage fixes of cpplint complaints.
     no_unstaged_changes_in_staged_files = check_modified_after_staging(staged_files)
 
-    # TODO(mfehr) : add clang formatter here.
+    clang_format_success = run_clang_format(repo_root, staged_files)
+    autopep8_format_success = run_autopep8_format(repo_root, staged_files)
+
+    if not clang_format_success and autopep8_format_success:
+      print("===================================================")
+      print("ERROR: Could not format your code!")
+      print("===================================================")
+      exit(1)
 
     # Use Google's C++ linter to check for compliance with Google style guide.
     cpp_lint_success = check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art)
