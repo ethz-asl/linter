@@ -8,6 +8,7 @@
 
 import codecs
 import copy
+import datetime
 import getopt
 import imp
 import imp
@@ -21,6 +22,8 @@ import string
 import subprocess
 import sys
 import unicodedata
+
+clang_format_diff_executable = "clang-format-diff-3.8"
 
 
 def run_command_in_folder(command, folder):
@@ -85,25 +88,31 @@ def check_modified_after_staging(staged_files):
 
   staged_files_changed = 0
 
+  staged_files_changed_list = []
+
+  is_first = True
   for changed_file in files_changed:
     if changed_file in staged_files:
+
+      if is_first:
+        print("===================================================")
+        is_first = False
+
       print("\'{}\' was modified after staging".format(changed_file))
+      staged_files_changed_list.append(changed_file)
       staged_files_changed += 1
 
   if staged_files_changed > 0:
-    print("===================================================")
+    print("---------------------------------------------------")
     print("Found {} files that have been changed after staging".format(staged_files_changed))
     print("===================================================")
-    return False
-  else:
-    return True
+
+  return staged_files_changed_list
 
 
 def check_commit_against_master(repo_root, ascii_art):
   current_branch = run_command_in_folder("git branch | grep \"*\" | sed \"s/* //\"", repo_root)
-  print("===================================================")
-  print("Current_branch: {}".format(current_branch))
-  print("===================================================")
+  print("\nCurrent_branch: {}\n".format(current_branch))
   return current_branch == "master"
 
 
@@ -112,13 +121,41 @@ def check_if_merge_commit(repo_root):
   return os.path.isfile(merge_msg_file_path)
 
 
-def run_clang_format(repo_root, staged_files):
+def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
   """Runs clang format on all cpp files staged for commit."""
-  # TODO(mfehr): IMPLEMENT
+
+  clang_format_patch = "/tmp/-" + os.path.basename(os.path.normpath(repo_root)) + \
+      "_" + datetime.datetime.now().isoformat() + ".patch"
+
+  success = run_command_in_folder("git diff -U0 --cached | "
+                                  + clang_format_diff_executable + " -style=file -p1 > " + clang_format_patch, repo_root)
+
+  if not os.stat(clang_format_patch).st_size == 0:
+    if not list_of_changed_staged_files:
+      print("===================================================")
+      print("Cannot format your code, because some files are \n"
+            "only partially staged! Format your code or try \n"
+            "stashing your unstaged changes")
+      print("===================================================")
+      exit(1)
+
+    run_command_in_folder("git apply -p0 " + clang_format_patch, repo_root)
+    run_command_in_folder("git add " + ' '.join(staged_files), repo_root)
+
+    print("===================================================")
+    print("Formatted staged files with clang-format.")
+    print("===================================================")
+  else:
+    print("===================================================")
+    print("Nothing to do for clang-format, well done!")
+    print("===================================================")
+
+  run_command_in_folder("rm -rf " + clang_format_patch, repo_root)
+
   return True
 
 
-def run_autopep8_format(repo_root, staged_files):
+def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
   """Runs autopep8 format on all python files staged for commit."""
   # TODO(mfehr): IMPLEMENT
   return True
@@ -184,6 +221,7 @@ def main():
   ascii_art_file = repo_root + "/" + linter_subfolder + "/ascii_art.py"
 
   print("Found linter subfolder: {}".format(linter_subfolder))
+  print("Found ascii art file at: {}".format(ascii_art_file))
   print("Found cpplint file at: {}".format(cpplint_file))
   print("Found pylint file at: {}".format(pylint_file))
 
@@ -200,16 +238,10 @@ def main():
   if not check_if_merge_commit(repo_root):
     # Do not allow commiting files that were modified after staging.This
     # avoids problems such as forgetting to stage fixes of cpplint complaints.
-    no_unstaged_changes_in_staged_files = check_modified_after_staging(staged_files)
+    list_of_changed_staged_files = check_modified_after_staging(staged_files)
 
-    clang_format_success = run_clang_format(repo_root, staged_files)
-    autopep8_format_success = run_autopep8_format(repo_root, staged_files)
-
-    if not clang_format_success and autopep8_format_success:
-      print("===================================================")
-      print("ERROR: Could not format your code!")
-      print("===================================================")
-      exit(1)
+    run_clang_format(repo_root, staged_files, list_of_changed_staged_files)
+    run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files)
 
     # Use Google's C++ linter to check for compliance with Google style guide.
     cpp_lint_success = check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art)
@@ -217,7 +249,7 @@ def main():
     # Use pylint to check for comimpliance with Tensofrflow python style guide.
     pylint_success = check_python_lint(repo_root, staged_files, pylint_file)
 
-    if not(cpp_lint_success and pylint_success and no_unstaged_changes_in_staged_files):
+    if not(cpp_lint_success and pylint_success):
       exit(1)
     else:
       print(ascii_art.AsciiArt.zen_success)

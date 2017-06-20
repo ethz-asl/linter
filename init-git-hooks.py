@@ -12,6 +12,8 @@ import sys
 cpplint_url = 'https://raw.githubusercontent.com/google/styleguide/cf4071cf5de83c006b08bf8f62e1450d17a9ce07/cpplint/cpplint.py'
 pylint_url = 'https://raw.githubusercontent.com/vinitkumar/googlecl/6dc04b489dba709c53d2f4944473709617506589/googlecl-pylint.rc'
 
+clang_format_diff_executable = "clang-format-diff-3.8"
+
 
 def download_file_from_url(url, file_path):
   request = requests.get(url, verify=False, stream=True)
@@ -53,8 +55,8 @@ def main():
     print("ERROR: Could not download pylint.rc file!")
     exit(1)
 
-  if not cmd_exists("clang-format"):
-    print("ERROR: clang-format is not installed!")
+  if not cmd_exists(clang_format_diff_executable):
+    print("ERROR: " + clang_format_diff_executable + " is not installed!")
     exit(1)
 
   if not cmd_exists("autopep8"):
