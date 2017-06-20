@@ -1,8 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/ usr / bin / env python
+#- * - coding : utf - 8 - * -
 
 # Disable pylint invalid module name complaint.
-# pylint: disable=C0103
+# pylint : disable = C0103
 
 """ Pre Commit script for invoking linters."""
 
@@ -34,7 +34,7 @@ def run_command_in_folder(command, folder):
   return command_output
 
 
-def get_root_git_repo(some_folder_in_root_repo='./'):
+def get_git_repo_root(some_folder_in_root_repo='./'):
   return run_command_in_folder('git rev-parse --show-toplevel', some_folder_in_root_repo)
 
 
@@ -62,18 +62,20 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art):
     elif re.search(r'\.h$', changed_file):
       # Change global _root variable for desired behaviour of
       # cpplint's header guard. Without this change the header include
-      # guard would have to look like: INCLUDE_REFILL_SUBPATH_HEADER_H_.
-      # We want it to look like: REFILL_SUBPATH_HEADER_H_
+      # guard would have to look like : INCLUDE_${NAMESPACE}_SUBPATH_HEADER_H_.
+      # We want it to look like : ${NAMESPACE}_SUBPATH_HEADER_H_
       cpplint._root = "include"  # pylint: disable=W0212
       changed_file = repo_root + "/" + changed_file
       cpplint.ProcessFile(changed_file, 0)
       cpplint._root = None  # pylint: disable=W0212
 
   if cpplint._cpplint_state.error_count:  # pylint: disable=W0212
-    print(ascii_art.AsciiArt.zen_errors)
-    exit(cpplint._cpplint_state.error_count)  # pylint: disable=W0212
+    print("####################################################")
+    print("Found {} cpplint errors".format(cpplint._cpplint_state.error_count))
+    print("####################################################")
+    return false
   else:
-    print(ascii_art.AsciiArt.zen_success)
+    return true
 
 
 def check_modified_after_staging(staged_files):
@@ -85,21 +87,23 @@ def check_modified_after_staging(staged_files):
 
   for changed_file in files_changed:
     if changed_file in staged_files:
-      print changed_file + " modified after staging"
-      staged_files_changed = 1
+      print("\'{}\' was modified after staging".format(changed_file))
+      staged_files_changed += 1
 
-  if staged_files_changed:
-    print "Aborting commit: Staged files modified after staging."
-    exit(1)
+  if staged_files_changed > 0:
+    print("####################################################")
+    print("Found {} files that have been changed after staging".format(staged_files_changed))
+    print("####################################################")
+    return false
+  else:
+    print("No cpplint errors found.")
+    return true
 
 
 def check_commit_against_master(repo_root, ascii_art):
   current_branch = run_command_in_folder("git branch | grep \"*\" | sed \"s/* //\"", repo_root)
   print("Current_branch: {}".format(current_branch))
-  if current_branch == "master":
-    print(ascii_art.AsciiArt.grumpy_cat)
-    exit(1)
-  return
+  return current_branch == "master":
 
 
 def check_if_merge_commit(repo_root):
@@ -110,29 +114,26 @@ def check_if_merge_commit(repo_root):
 def check_python_lint(repo_root, staged_files, pylint_file):
   """Runs pylint on all python scripts staged for commit."""
 
-  # Dummy class for pylint related IO.
-  class WritableObject(object):
-    "dummy output stream for pylint"
+  class TextReporterBuffer(object):
+    """Stores the output produced by the pylint TextReporter."""
 
     def __init__(self):
       self.content = []
 
     def write(self, input_str):
-      "dummy write"
       self.content.append(input_str)
 
     def read(self):
-      "dummy read"
       return self.content
 
-  # Parse each pylint output line individualy and searches
-  # for errors in the code.
+# Parse each pylint output line individualy and searches
+# for errors in the code.
   pylint_errors = []
   for changed_file in staged_files:
     if re.search(r'\.py$', changed_file):
 
-      print "Running pylint on " + repo_root + "/" + changed_file
-      pylint_output = WritableObject()
+      print("Running pylint on \'{}\'".format(repo_root + "/" + changed_file))
+      pylint_output = TextReporterBuffer()
       pylint_args = ["--rcfile=" + pylint_file,
                      "-rn",
                      repo_root + "/" + changed_file]
@@ -143,52 +144,63 @@ def check_python_lint(repo_root, staged_files, pylint_file):
 
       for output_line in pylint_output.read():
         if re.search(r'^(E|C|W):', output_line):
-          print changed_file + ": " + output_line
+          print(changed_file + ": " + output_line)
           pylint_errors.append(output_line)
 
   if len(pylint_errors) > 0:
-    print "Pylint found errors. Terminating."
-    exit(len(pylint_errors))
+    print("####################################################")
+    print("Found {} pylint errors".format(len(pylint_errors)))
+    print("####################################################")
+    return false
+  else:
+    print("No pylint errors found.")
+    return true
 
 
 def main():
   """ Main pre-commit function for calling code checking script. """
 
-  # Get git root folder.
-  repo_root = get_root_git_repo()
+# Get git root folder.
+  repo_root = get_git_repo_root()
 
-  # Get linter subfolder
+# Get linter subfolder
   linter_subfolder = get_linter_subfolder(repo_root)
 
   cpplint_file = repo_root + "/" + linter_subfolder + "/cpplint.py"
   pylint_file = repo_root + "/" + linter_subfolder + "/pylint.rc"
   ascii_art_file = repo_root + "/" + linter_subfolder + "/ascii_art.py"
 
-  # TODO(mfehr): remove this
   print("Found linter subfolder: {}".format(linter_subfolder))
   print("Found cpplint file at: {}".format(cpplint_file))
   print("Found pylint file at: {}".format(pylint_file))
 
-  # Run checks
+# Run checks
   staged_files = get_staged_files()
 
-  # Load ascii art.
+# Load ascii art.
   ascii_art = imp.load_source('ascii_art', ascii_art_file)
 
-  check_commit_against_master(repo_root, ascii_art)
+  if check_commit_against_master(repo_root, ascii_art):
+    print(ascii_art.AsciiArt.grumpy_cat)
+    exit(1)
 
   if not check_if_merge_commit(repo_root):
-    # Do not allow commiting files that were modified after staging. This
+    # Do not allow commiting files that were modified after staging.This
     # avoids problems such as forgetting to stage fixes of cpplint complaints.
-    # check_modified_after_staging(staged_files)
+    no_unstaged_changes_in_staged_files = check_modified_after_staging(staged_files)
 
-    # TODO(mfehr): add clang formatter here.
+    # TODO(mfehr) : add clang formatter here.
 
     # Use Google's C++ linter to check for compliance with Google style guide.
-    check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art)
+    cpp_lint_success = check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art)
 
     # Use pylint to check for comimpliance with Tensofrflow python style guide.
-    check_python_lint(repo_root, staged_files, pylint_file)
+    pylint_success = check_python_lint(repo_root, staged_files, pylint_file)
+
+    if not(cpp_lint_success and pylint_success and no_unstaged_changes_in_staged_files):
+      exit(1)
+    else
+      print(ascii_art.AsciiArt.zen_success)
   else:
     print(ascii_art.AsciiArt.homer_woohoo)
 

@@ -20,7 +20,7 @@ def download_file_from_url(url, file_path):
     shutil.copyfileobj(request.raw, downloaded_file)
 
 
-def get_root_git_repo(some_folder_in_root_repo='./'):
+def get_git_repo_root(some_folder_in_root_repo='./'):
   get_repo_call = subprocess.Popen("git rev-parse --show-toplevel",
                                    shell=True,
                                    cwd=some_folder_in_root_repo,
@@ -42,14 +42,14 @@ def main():
   download_file_from_url(pylint_url, script_directory + "/pylint.rc")
 
   # Get git root folder of parent repository.
-  repo_root = get_root_git_repo(script_directory + '/../')
+  repo_root = get_git_repo_root(script_directory + '/../')
 
   # Copy git hooks.
   cp_params = repo_root + "/linter/pre-commit " + repo_root + "/.git/hooks/"
   if subprocess.call("cp " + cp_params, shell=True) != 0:
     print("Failed to copy githooks to {}...".format((repo_root + "/.git/hooks/")))
 
-  print("Success!")
+  print("Success, githooks initialized!")
 
 
 if __name__ == "__main__":
