@@ -1,5 +1,5 @@
-#!/ usr / bin / env python
-#- * - coding : utf - 8 - * -
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Disable pylint invalid module name complaint.
 # pylint : disable = C0103
@@ -70,12 +70,12 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file, ascii_art):
       cpplint._root = None  # pylint: disable=W0212
 
   if cpplint._cpplint_state.error_count:  # pylint: disable=W0212
-    print("####################################################")
+    print("===================================================")
     print("Found {} cpplint errors".format(cpplint._cpplint_state.error_count))
-    print("####################################################")
-    return false
+    print("===================================================")
+    return False
   else:
-    return true
+    return True
 
 
 def check_modified_after_staging(staged_files):
@@ -91,19 +91,20 @@ def check_modified_after_staging(staged_files):
       staged_files_changed += 1
 
   if staged_files_changed > 0:
-    print("####################################################")
+    print("===================================================")
     print("Found {} files that have been changed after staging".format(staged_files_changed))
-    print("####################################################")
-    return false
+    print("===================================================")
+    return False
   else:
-    print("No cpplint errors found.")
-    return true
+    return True
 
 
 def check_commit_against_master(repo_root, ascii_art):
   current_branch = run_command_in_folder("git branch | grep \"*\" | sed \"s/* //\"", repo_root)
+  print("===================================================")
   print("Current_branch: {}".format(current_branch))
-  return current_branch == "master":
+  print("===================================================")
+  return current_branch == "master"
 
 
 def check_if_merge_commit(repo_root):
@@ -148,13 +149,13 @@ def check_python_lint(repo_root, staged_files, pylint_file):
           pylint_errors.append(output_line)
 
   if len(pylint_errors) > 0:
-    print("####################################################")
+    print("===================================================")
     print("Found {} pylint errors".format(len(pylint_errors)))
-    print("####################################################")
-    return false
+    print("===================================================")
+    return False
   else:
     print("No pylint errors found.")
-    return true
+    return True
 
 
 def main():
@@ -199,7 +200,7 @@ def main():
 
     if not(cpp_lint_success and pylint_success and no_unstaged_changes_in_staged_files):
       exit(1)
-    else
+    else:
       print(ascii_art.AsciiArt.zen_success)
   else:
     print(ascii_art.AsciiArt.homer_woohoo)
