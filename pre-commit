@@ -47,7 +47,10 @@ def get_linter_subfolder(root_repo_folder):
 
 def get_staged_files(some_folder_in_root_repo='./'):
   output = run_command_in_folder("git diff --staged --name-only", some_folder_in_root_repo)
-  return output.split("\n")
+  if len(output) == 0:
+    return []
+  else:
+    return output.split("\n")
 
 
 def get_unstaged_files(some_folder_in_root_repo='./'):
@@ -131,11 +134,11 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
                                   + clang_format_diff_executable + " -style=file -p1 > " + clang_format_patch, repo_root)
 
   if not os.stat(clang_format_patch).st_size == 0:
-    if not list_of_changed_staged_files:
+    if list_of_changed_staged_files:
       print("===================================================")
       print("Cannot format your code, because some files are \n"
             "only partially staged! Format your code or try \n"
-            "stashing your unstaged changes")
+            "stashing your unstaged changes...")
       print("===================================================")
       exit(1)
 
@@ -144,10 +147,6 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
 
     print("===================================================")
     print("Formatted staged files with clang-format.")
-    print("===================================================")
-  else:
-    print("===================================================")
-    print("Nothing to do for clang-format, well done!")
     print("===================================================")
 
   run_command_in_folder("rm -rf " + clang_format_patch, repo_root)
@@ -203,7 +202,6 @@ def check_python_lint(repo_root, staged_files, pylint_file):
     print("===================================================")
     return False
   else:
-    print("No pylint errors found.")
     return True
 
 
@@ -227,6 +225,13 @@ def main():
 
 # Run checks
   staged_files = get_staged_files()
+
+  if len(staged_files) == 0:
+    print("\n")
+    print("===================================================")
+    print("No files staged...")
+    print("===================================================")
+    exit(1)
 
 # Load ascii art.
   ascii_art = imp.load_source('ascii_art', ascii_art_file)
@@ -252,6 +257,11 @@ def main():
     if not(cpp_lint_success and pylint_success):
       exit(1)
     else:
+
+      print("===================================================")
+      print("Commit accepted, well done!")
+      print("===================================================")
+
       print(ascii_art.AsciiArt.zen_success)
   else:
     print(ascii_art.AsciiArt.homer_woohoo)
