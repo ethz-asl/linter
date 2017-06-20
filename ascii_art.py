@@ -19,8 +19,8 @@ class AsciiArt(object):
                88          _(<_   / )_          88
               d88b        (__\_\_|_/__)        d88b
 
-        "Happiness does not depend on what you have or what your are,
-         it solely depends on the beauty of your code."
+        "Your happiness shall not depend on what you have or what your are,
+         it shall solely depend on the beauty of your code."
 
         -- Budda (sort of)
 
@@ -70,7 +70,7 @@ class AsciiArt(object):
     oMMd     :NMMs  -yNMMMMMMMMh:  .MMM/        dMMMMMMMMMM-
     .//:      `//-     .:+++/-      :::`        ://////////`
 
-    Never commit directly to master!
+    One shan't commit directly to master!
 
 """
 
