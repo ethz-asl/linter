@@ -1,6 +1,41 @@
 # ASL linter
 
-This repo contains a generic (C++, python) linter and auto formatter package that can be included into your repository as a submodule:
+This repo contains a generic (C++, python) linter and auto formatter package that can be included into your repository as a submodule. It provides the following git hooks:
+ * **General**
+   * Prevent commits to master.
+ * **C++** files:
+   * **clang-format** Formats your code based on your .clang-format preferences.
+   * **cpplint** Checks your C++ code for style errors and warnings.
+ * **Python** files:
+   * **autopep8** Formats your python code.
+   * **pylint** Checks your Python code for style errors and warnings.
+
+## TODOs:
+
+ - [x] Add clang formatter
+ - [x] Add autopep8 formatter for python
+ - [x] Don't format merge commit changes
+ - [x] Make generic and/or provide environment variables to adapt to repo
+ - [ ] Make sure repos-specific style is used for both linter and clang-format.
+ - [ ] Add to repos and test it:
+   - [ ] maplab
+   - [ ] voxblox
+   - [ ] turtlebot_navigation
+   - [ ] refill
+
+
+## Dependencies
+
+ * **autopep8** ([Introduction to autopep8](http://avilpage.com/2015/05/automatically-pep8-your-python-code.html))
+   * Ubuntu: `pip install autopep8`
+   * OSX: **TODO**
+ * **clang-format**
+   * Ubuntu: `sudo apt-get install clang-format-3.X`
+   * OSX: **TODO**
+
+
+## Installation
+
 ```bash
 cd $YOUR_REPO
 git add submodule git@github.com:ethz-asl/linter.git
@@ -15,28 +50,23 @@ git add submodule git@github.com:ethz-asl/linter.git
 ./linter/init-git-hooks.py
 ```
 
-The following git hooks are installed:
- * cpp files:
-   * cpplint
- * python files:
-   * pylint
+Define the project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example:
 
-Dependencies:
- * **autopep8** ([Introduction to autopep8](http://avilpage.com/2015/05/automatically-pep8-your-python-code.html))
-   * Ubuntu: `pip install autopep8`
-   * OSX: **TODO**
- * **clang-format**
-   * Ubuntu: `sudo apt-get install clang-format-3.X`
-   * OSX: **TODO**
-
-TODOs:
- - [ ] Add clang formatter
- - [ ] Add yapf/pep formatter for python
- - [x] Don't format merge commit changes
- - [x] Make generic and/or provide environment variables to adapt to repo
- - [ ] Repos-specific style
- - [ ] Add to repos and test it:
-   - [ ] maplab
-   - [ ] voxblox
-   - [ ] turtlebot_navigation
-   - [ ] refill
+```
+---
+Language: Cpp
+BasedOnStyle: Google
+DerivePointerAlignment: false
+PointerAlignment: Left
+ColumnLimit: 80
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlignAfterOpenBracket: AlwaysBreak
+IncludeCategories:
+  - Regex:           '^<.*'
+    Priority:        1
+  - Regex:           '.*'
+    Priority:        2
+...
+```
