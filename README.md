@@ -16,7 +16,8 @@ This repo contains a generic (C++, python) linter and auto formatter package tha
  - [x] Add autopep8 formatter for python
  - [x] Don't format merge commit changes
  - [x] Make generic and/or provide environment variables to adapt to repo
- - [ ] Make sure repos-specific style is used for both linter and clang-format.
+ - [ ] Make sure repos-specific C++ style is used for both cpplint and clang-format.
+ - [ ] Make sure repos-specific pyton style is used for both pylint and autopep8.
  - [ ] Add to repos and test it:
    - [ ] maplab
    - [ ] voxblox
