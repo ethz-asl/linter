@@ -78,9 +78,9 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file):
 
   error_count = cpplint._cpplint_state.error_count  # pylint: disable=W0212
   if error_count:
-    print("===================================================")
+    print("=" * 50)
     print("Found {} cpplint errors".format(error_count))
-    print("===================================================")
+    print("=" * 50)
     return False
   else:
     return True
@@ -100,7 +100,7 @@ def check_modified_after_staging(staged_files):
     if changed_file in staged_files:
 
       if is_first:
-        print("===================================================")
+        print("=" * 50)
         is_first = False
 
       print("\'{}\' was modified after staging".format(changed_file))
@@ -111,7 +111,7 @@ def check_modified_after_staging(staged_files):
     print("---------------------------------------------------")
     print("Found {} files that have been changed after staging".format(
         staged_files_changed))
-    print("===================================================")
+    print("=" * 50)
 
   return staged_files_changed_list
 
@@ -133,29 +133,29 @@ def check_if_merge_commit(repo_root):
 def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
   """Runs clang format on all cpp files staged for commit."""
 
-  clang_format_patch = "/tmp/" + os.path.basename(os.path.normpath(repo_root)) + \
+  clang_format_path = "/tmp/" + os.path.basename(os.path.normpath(repo_root)) + \
       "_" + datetime.datetime.now().isoformat() + ".clang.patch"
 
   run_command_in_folder("git diff -U0 --cached | "
-                        + CLANG_FORMAT_DIFF_EXECUTABLE + " -style=file -p1 > " + clang_format_patch, repo_root)
+                        + CLANG_FORMAT_DIFF_EXECUTABLE + " -style=file -p1 > " + clang_format_path, repo_root)
 
-  if not os.stat(clang_format_patch).st_size == 0:
+  if not os.stat(clang_format_path).st_size == 0:
     if list_of_changed_staged_files:
-      print("===================================================")
+      print("=" * 50)
       print("Cannot format your code, because some files are \n"
             "only partially staged! Format your code or try \n"
             "stashing your unstaged changes...")
-      print("===================================================")
+      print("=" * 50)
       exit(1)
 
-    run_command_in_folder("git apply -p0 " + clang_format_patch, repo_root)
+    run_command_in_folder("git apply -p0 " + clang_format_path, repo_root)
     run_command_in_folder("git add " + ' '.join(staged_files), repo_root)
 
-    print("===================================================")
+    print("=" * 50)
     print("Formatted staged C++ files with clang-format.")
-    print("===================================================")
+    print("=" * 50)
 
-  run_command_in_folder("rm -rf " + clang_format_patch, repo_root)
+  run_command_in_folder("rm -rf " + clang_format_path, repo_root)
 
   return True
 
@@ -169,19 +169,19 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
 
       # Check if the file needs formatting by applying the formatting and store
       # the results into a patch file.
-      autopep8_format_patch = ("/tmp/" +
-                               os.path.basename(os.path.normpath(repo_root)) +
-                               "_" + datetime.datetime.now().isoformat() +
-                               ".autopep8.patch")
+      autopep8_format_path = ("/tmp/" +
+                              os.path.basename(os.path.normpath(repo_root)) +
+                              "_" + datetime.datetime.now().isoformat() +
+                              ".autopep8.patch")
       task = (AUTOPEP8_FORMAT_EXECUTABLE +
               " -d --aggressive --aggressive --max-line-length=80 " +
               "--indent-size=2 --ignore=E24 " +
-              staged_file + " > " + autopep8_format_patch)
+              staged_file + " > " + autopep8_format_path)
       run_command_in_folder(task, repo_root)
 
-      if not os.stat(autopep8_format_patch).st_size == 0:
+      if not os.stat(autopep8_format_path).st_size == 0:
         if first_file_formatted:
-          print("===================================================")
+          print("=" * 50)
           print("Formatted staged python files with autopep8:")
           first_file_formatted = False
 
@@ -191,15 +191,15 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
           print("Cannot format your code, because this file is \n"
                 "only partially staged! Format your code or try \n"
                 "stashing your unstaged changes...")
-          print("===================================================")
+          print("=" * 50)
           exit(1)
         else:
           run_command_in_folder(
-              "git apply -p1 " + autopep8_format_patch, repo_root)
+              "git apply -p1 " + autopep8_format_path, repo_root)
           run_command_in_folder("git add " + staged_file, repo_root)
 
   if not first_file_formatted:
-    print("===================================================")
+    print("=" * 50)
   return True
 
 
@@ -243,9 +243,9 @@ def check_python_lint(repo_root, staged_files, pylint_file):
           pylint_errors.append(output_line)
 
   if len(pylint_errors) > 0:
-    print("===================================================")
+    print("=" * 50)
     print("Found {} pylint errors".format(len(pylint_errors)))
-    print("===================================================")
+    print("=" * 50)
     return False
   else:
     return True
@@ -274,9 +274,9 @@ def main():
 
   if len(staged_files) == 0:
     print("\n")
-    print("===================================================")
+    print("=" * 50)
     print("No files staged...")
-    print("===================================================")
+    print("=" * 50)
     exit(1)
 
 # Load ascii art.
@@ -304,9 +304,9 @@ def main():
       exit(1)
     else:
 
-      print("===================================================")
+      print("=" * 50)
       print("Commit accepted, well done!")
-      print("===================================================")
+      print("=" * 50)
 
       print(ascii_art.AsciiArt.zen_success)
   else:
