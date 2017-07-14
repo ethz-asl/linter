@@ -19,9 +19,7 @@ This repo contains a generic (C++, python) linter and auto formatter package tha
  - [ ] Make sure repos-specific C++ style is used for both cpplint and clang-format.
     - [x] clang-format: uses .clang-format file in parent repo
     - [ ] cpplint: ? not sure ?
- - [ ] Make sure repos-specific pyton style is used for both pylint and autopep8.
-    - [ ] autopep8: hardcoded style
-    - [ ] pylint: ? not sure ?
+ - [ ] Make sure the same python style is used for both pylint and autopep8.
  - [ ] Add to repos and test it:
    - [ ] maplab
    - [ ] voxblox
@@ -32,11 +30,9 @@ This repo contains a generic (C++, python) linter and auto formatter package tha
 ## Dependencies
 
  * **autopep8** ([Introduction to autopep8](http://avilpage.com/2015/05/automatically-pep8-your-python-code.html))
-   * Ubuntu: `pip install autopep8`
-   * OSX: **TODO**
+   * Ubuntu 14.04: `pip install autopep8`
  * **clang-format**
-   * Ubuntu: `sudo apt-get install clang-format-3.X`
-   * OSX: **TODO**
+   * Ubuntu 14.04: `sudo apt-get install clang-format-3.X`
 
 
 ## Installation
@@ -50,9 +46,8 @@ git add submodule git@github.com:ethz-asl/linter.git
 You can also add the linter submodule in a subfolder of your repo, e.g.:
 ```bash
 mkdir $YOUR_REPO/dev_tools
-cd  $YOUR_REPO/dev_tools
-git add submodule git@github.com:ethz-asl/linter.git
-./linter/init-git-hooks.py
+git add submodule git@github.com:ethz-asl/linter.git dev_tools/linter
+./dev_tools/linter/init-git-hooks.py
 ```
 
 Define the project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example:
