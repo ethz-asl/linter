@@ -67,7 +67,7 @@ def main():
   repo_root = get_git_repo_root(script_directory + '/../')
 
   # Copy git hooks.
-  cp_params = repo_root + "/linter/pre-commit " + repo_root + "/.git/hooks/"
+  cp_params = script_directory + "/pre-commit " + repo_root + "/.git/hooks/"
   if subprocess.call("cp " + cp_params, shell=True) != 0:
     print("Failed to copy githooks to {}...".format((repo_root + "/.git/hooks/")))
 
