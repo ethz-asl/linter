@@ -20,7 +20,7 @@ clang_format_diff_executable = "clang-format-diff-3.8"
 
 
 def download_file_from_url(url, file_path):
-  request = requests.get(url, verify=False, stream=True)
+  request = requests.get(url, verify=True, stream=True)
   request.raw.decode_content = True
   with open(file_path, 'w') as downloaded_file:
     shutil.copyfileobj(request.raw, downloaded_file)
