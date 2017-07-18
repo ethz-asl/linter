@@ -65,6 +65,9 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file):
   """Runs Google's cpplint on all C++ files staged for commit,"""
   cpplint = imp.load_source('cpplint', cpplint_file)
   cpplint._cpplint_state.SetFilters('-legal/copyright')
+
+  # Prevent cpplint from writing to stdout directly, instead the errors will be stored in c
+  # pplint.output as (line, message) tuples.
   cpplint.print_stdout = False
 
   total_error_count = 0
