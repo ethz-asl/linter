@@ -1,7 +1,20 @@
 #!/usr/bin/env python
 # Disable pylint filename and missing module member complaints.
 # pylint: disable=C0103,E1101
-""" Initializes git hooks for current project folder. """
+
+"""
+Initializes git hooks for the parent git repository.
+
+TODO(mfehr): fix this script such that we can use the new cpplint. It currently results in
+warnings that are not correct IMO. Also ideally find a way to use the cpplint file online
+directly, however that would require a different way of parsing the linter output.
+
+Set this variable to download the cpplint file instead of using the local !modified! copy:
+cpplint_url = 'https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py'
+
+Set this variable to use the local modified copy of the newest cpplint script:
+default_cpplint = "new_cpplint.py"
+"""
 
 import os
 import requests
@@ -9,10 +22,7 @@ import shutil
 import subprocess
 import sys
 
-
-# cpplint_url = 'https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py'
 default_cpplint = "old_cpplint.py"
-# default_cpplint = "new_cpplint.py"
 
 pylint_url = 'https://raw.githubusercontent.com/vinitkumar/googlecl/6dc04b489dba709c53d2f4944473709617506589/googlecl-pylint.rc'
 
@@ -58,7 +68,7 @@ def main():
     cp_params = (script_directory + "/default/" + default_cpplint + " " +
                  script_directory + "/cpplint.py")
     if subprocess.call("cp " + cp_params, shell=True) != 0:
-      print("Failed to copy default cpplint")
+      print("Failed to copy default cpplint.")
       exit(1)
 
   download_file_from_url(pylint_url, script_directory + "/pylint.rc")

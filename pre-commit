@@ -70,6 +70,7 @@ def check_cpp_lint(repo_root, staged_files, cpplint_file):
   total_error_count = 0
   for changed_file in staged_files:
     if changed_file.lower().endswith(('.cc', '.h', '.cpp', '.cu', '.cuh')):
+      # Search iteratively for the root of the catkin package.
       package_root = ''
       search_dir = os.path.dirname(changed_file)
       found_package_root = False
@@ -326,6 +327,9 @@ def main():
     pylint_success = check_python_lint(repo_root, staged_files, pylint_file)
 
     if not(cpp_lint_success and pylint_success):
+      print("=" * 80)
+      print("Commit rejected! Please address the linter errors above.")
+      print("=" * 80)
       exit(1)
     else:
 
