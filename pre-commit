@@ -11,10 +11,12 @@ from __future__ import print_function
 
 import datetime
 import imp
+import itertools
 import os
 import pylint.lint
 import re
 import subprocess
+import sys
 
 CLANG_FORMAT_DIFF_EXECUTABLE = "clang-format-diff-3.8"
 AUTOPEP8_FORMAT_EXECUTABLE = "autopep8"
@@ -62,25 +64,52 @@ def get_unstaged_files(some_folder_in_root_repo='./'):
 def check_cpp_lint(repo_root, staged_files, cpplint_file):
   """Runs Google's cpplint on all C++ files staged for commit,"""
   cpplint = imp.load_source('cpplint', cpplint_file)
-  for changed_file in staged_files:
-    if re.search(r'\.cc$', changed_file):
-      changed_file = repo_root + "/" + changed_file
-      cpplint.ProcessFile(changed_file, 0)
-    elif re.search(r'\.h$', changed_file):
-      # Change global _root variable for desired behaviour of
-      # cpplint's header guard. Without this change the header include
-      # guard would have to look like : INCLUDE_${NAMESPACE}_SUBPATH_HEADER_H_.
-      # We want it to look like : ${NAMESPACE}_SUBPATH_HEADER_H_
-      cpplint._root = "include"  # pylint: disable=W0212
-      changed_file = repo_root + "/" + changed_file
-      cpplint.ProcessFile(changed_file, 0)
-      cpplint._root = None  # pylint: disable=W0212
+  cpplint._cpplint_state.SetFilters('-legal/copyright')
 
-  error_count = cpplint._cpplint_state.error_count  # pylint: disable=W0212
-  if error_count:
-    print("=" * 50)
-    print("Found {} cpplint errors".format(error_count))
-    print("=" * 50)
+  # Prevent cpplint from writing to stdout directly, instead the errors will be stored in c
+  # pplint.output as (line, message) tuples.
+  cpplint.print_stdout = False
+
+  total_error_count = 0
+  for changed_file in staged_files:
+    if changed_file.lower().endswith(('.cc', '.h', '.cpp', '.cu', '.cuh')):
+      # Search iteratively for the root of the catkin package.
+      package_root = ''
+      search_dir = os.path.dirname(changed_file)
+      found_package_root = False
+      for i in range(1, 10):
+        if os.path.isfile(search_dir + '/package.xml'):
+          package_root = search_dir
+          found_package_root = True
+          break
+        search_dir = os.path.dirname(search_dir)
+      assert found_package_root, ("Could not find the root of the catkin package "
+                                  "that contains: {}".format(changed_file))
+
+      cpplint._root = package_root + '/include'
+
+      # Reset error count and messages:
+      cpplint.output = []
+      cpplint._cpplint_state.ResetErrorCounts()
+
+      cpplint.ProcessFile(changed_file, cpplint._cpplint_state.verbose_level)
+
+      error_count = cpplint._cpplint_state.error_count  # pylint: disable=W0212
+      if error_count > 0:
+        total_error_count += error_count
+
+        print("-" * 80)
+        print("Found {} errors in : {}".format(
+            error_count, changed_file))
+        print("-" * 80)
+        for line in cpplint.output:
+          assert len(line) == 2
+          print("line {: >4}:\t {}".format(line[0], line[1]))
+
+  if total_error_count > 0:
+    print("=" * 80)
+    print("Found {} cpplint errors".format(total_error_count))
+    print("=" * 80)
     return False
   else:
     return True
@@ -100,7 +129,7 @@ def check_modified_after_staging(staged_files):
     if changed_file in staged_files:
 
       if is_first:
-        print("=" * 50)
+        print("=" * 80)
         is_first = False
 
       print("\'{}\' was modified after staging".format(changed_file))
@@ -108,10 +137,10 @@ def check_modified_after_staging(staged_files):
       staged_files_changed += 1
 
   if staged_files_changed > 0:
-    print("---------------------------------------------------")
+    print("-" * 80)
     print("Found {} files that have been changed after staging".format(
         staged_files_changed))
-    print("=" * 50)
+    print("=" * 80)
 
   return staged_files_changed_list
 
@@ -133,27 +162,27 @@ def check_if_merge_commit(repo_root):
 def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
   """Runs clang format on all cpp files staged for commit."""
 
-  clang_format_path = "/tmp/" + os.path.basename(os.path.normpath(repo_root)) + \
-      "_" + datetime.datetime.now().isoformat() + ".clang.patch"
+  clang_format_path = ("/tmp/" + os.path.basename(os.path.normpath(repo_root)) +
+                       "_" + datetime.datetime.now().isoformat() + ".clang.patch")
 
   run_command_in_folder("git diff -U0 --cached | "
                         + CLANG_FORMAT_DIFF_EXECUTABLE + " -style=file -p1 > " + clang_format_path, repo_root)
 
   if not os.stat(clang_format_path).st_size == 0:
     if list_of_changed_staged_files:
-      print("=" * 50)
+      print("=" * 80)
       print("Cannot format your code, because some files are \n"
             "only partially staged! Format your code or try \n"
             "stashing your unstaged changes...")
-      print("=" * 50)
+      print("=" * 80)
       exit(1)
 
     run_command_in_folder("git apply -p0 " + clang_format_path, repo_root)
     run_command_in_folder("git add " + ' '.join(staged_files), repo_root)
 
-    print("=" * 50)
+    print("=" * 80)
     print("Formatted staged C++ files with clang-format.")
-    print("=" * 50)
+    print("=" * 80)
 
   run_command_in_folder("rm -rf " + clang_format_path, repo_root)
 
@@ -181,7 +210,7 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
 
       if not os.stat(autopep8_format_path).st_size == 0:
         if first_file_formatted:
-          print("=" * 50)
+          print("=" * 80)
           print("Formatted staged python files with autopep8:")
           first_file_formatted = False
 
@@ -191,7 +220,7 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
           print("Cannot format your code, because this file is \n"
                 "only partially staged! Format your code or try \n"
                 "stashing your unstaged changes...")
-          print("=" * 50)
+          print("=" * 80)
           exit(1)
         else:
           run_command_in_folder(
@@ -199,7 +228,7 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
           run_command_in_folder("git add " + staged_file, repo_root)
 
   if not first_file_formatted:
-    print("=" * 50)
+    print("=" * 80)
   return True
 
 
@@ -243,9 +272,9 @@ def check_python_lint(repo_root, staged_files, pylint_file):
           pylint_errors.append(output_line)
 
   if len(pylint_errors) > 0:
-    print("=" * 50)
+    print("=" * 80)
     print("Found {} pylint errors".format(len(pylint_errors)))
-    print("=" * 50)
+    print("=" * 80)
     return False
   else:
     return True
@@ -274,9 +303,9 @@ def main():
 
   if len(staged_files) == 0:
     print("\n")
-    print("=" * 50)
+    print("=" * 80)
     print("No files staged...")
-    print("=" * 50)
+    print("=" * 80)
     exit(1)
 
 # Load ascii art.
@@ -301,12 +330,15 @@ def main():
     pylint_success = check_python_lint(repo_root, staged_files, pylint_file)
 
     if not(cpp_lint_success and pylint_success):
+      print("=" * 80)
+      print("Commit rejected! Please address the linter errors above.")
+      print("=" * 80)
       exit(1)
     else:
 
-      print("=" * 50)
+      print("=" * 80)
       print("Commit accepted, well done!")
-      print("=" * 50)
+      print("=" * 80)
 
       print(ascii_art.AsciiArt.zen_success)
   else:
