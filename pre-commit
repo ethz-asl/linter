@@ -340,7 +340,7 @@ def main():
       print("Commit accepted, well done!")
       print("=" * 80)
 
-      print(ascii_art.AsciiArt.zen_success)
+      print(ascii_art.AsciiArt.commit_success)
   else:
     print(ascii_art.AsciiArt.homer_woohoo)
 

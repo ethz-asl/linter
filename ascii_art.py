@@ -4,7 +4,7 @@
 
 class AsciiArt(object):
 
-  zen_success = """
+  commit_success = """
             d888888b                         d888888b
          d888    8888b                    d888888   888b
        d88    88  898888b               d8888  888     88b
@@ -110,11 +110,3 @@ class AsciiArt(object):
                       Woohoo, no clang or linter for merge commits!
 
 """
-
-  zen_errors = """
-
-        "Your worst enemy cannot harm you as much as your own buggy code."
-
-        - - Budda(sort of)
-
-  """
