@@ -1,4 +1,4 @@
-# ASL linter
+# linter
 
 This repo contains a generic (C++, python) linter and auto formatter package that can be included into your repository as a submodule. It provides the following git hooks:
  * **General**
@@ -9,23 +9,6 @@ This repo contains a generic (C++, python) linter and auto formatter package tha
  * **Python** files:
    * **autopep8** Formats your python code.
    * **pylint** Checks your Python code for style errors and warnings.
-
-## TODOs:
-
- - [x] Add clang formatter
- - [x] Add autopep8 formatter for python
- - [x] Don't format merge commit changes
- - [x] Make generic and/or provide environment variables to adapt to repo
- - [ ] Make sure repos-specific C++ style is used for both cpplint and clang-format.
-    - [x] clang-format: uses .clang-format file in parent repo
-    - [ ] cpplint: ? not sure ?
- - [ ] Make sure the same python style is used for both pylint and autopep8.
- - [ ] Add to repos and test it:
-   - [ ] maplab
-   - [ ] voxblox
-   - [ ] turtlebot_navigation
-   - [ ] refill
-
 
 ## Dependencies
 
