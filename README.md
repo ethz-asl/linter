@@ -13,9 +13,14 @@ This repo contains a generic (C++, python) linter and auto formatter package tha
 ## Dependencies
 
  * **autopep8** ([Introduction to autopep8](http://avilpage.com/2015/05/automatically-pep8-your-python-code.html))
-   * Ubuntu 14.04: `pip install autopep8`
+   * Ubuntu 14.04 / macOS: `pip install autopep8`
  * **clang-format**
    * Ubuntu 14.04: `sudo apt-get install clang-format-3.X`
+   * macOS: 
+     ```
+     brew install clang-format
+     ln -s /usr/local/share/clang/clang-format-diff.py /usr/local/bin/clang-format-diff-3.8
+     ```
 
 
 ## Installation
