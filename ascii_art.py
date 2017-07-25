@@ -107,6 +107,6 @@ class AsciiArt(object):
                       /R                                     1L
                      /R
 
-                      Woohoo, no clang or linter for merge commits!
+                  Woohoo, no formatter or linter for merge commits!
 
 """

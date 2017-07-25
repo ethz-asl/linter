@@ -186,11 +186,9 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
     run_command_in_folder("git add " + ' '.join(staged_files), repo_root)
 
     print("=" * 80)
-    print("Formatted staged C++ files with clang-format.")
+    print("Formatted staged C++ files with clang-format.\n" +
+          "Patch: {}".format(clang_format_path))
     print("=" * 80)
-
-  run_command_in_folder("rm -rf " + clang_format_path, repo_root)
-
   return True
 
 
@@ -255,8 +253,8 @@ def check_python_lint(repo_root, staged_files, pylint_file):
       """read"""
       return self.content
 
-# Parse each pylint output line individualy and searches
-# for errors in the code.
+  # Parse each pylint output line individualy and searches
+  # for errors in the code.
   pylint_errors = []
   for changed_file in staged_files:
     if re.search(r'\.py$', changed_file):
@@ -288,10 +286,10 @@ def check_python_lint(repo_root, staged_files, pylint_file):
 def main():
   """ Main pre-commit function for calling code checking script. """
 
-# Get git root folder.
+  # Get git root folder.
   repo_root = get_git_repo_root()
 
-# Get linter subfolder
+  # Get linter subfolder
   linter_subfolder = get_linter_subfolder(repo_root)
 
   cpplint_file = repo_root + "/" + linter_subfolder + "/cpplint.py"
@@ -303,7 +301,7 @@ def main():
   print("Found cpplint file at: {}".format(cpplint_file))
   print("Found pylint file at: {}".format(pylint_file))
 
-# Run checks
+  # Run checks
   staged_files = get_staged_files()
 
   if len(staged_files) == 0:
@@ -313,7 +311,7 @@ def main():
     print("=" * 80)
     exit(1)
 
-# Load ascii art.
+  # Load ascii art.
   ascii_art = imp.load_source('ascii_art', ascii_art_file)
 
   if check_commit_against_master(repo_root):
