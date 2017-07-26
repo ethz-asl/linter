@@ -8,6 +8,7 @@
 
 # Make sure we use the new print function
 from __future__ import print_function
+from random import randint
 
 import datetime
 import imp
@@ -38,6 +39,11 @@ def get_git_repo_root(some_folder_in_root_repo='./'):
                                some_folder_in_root_repo)
 
 
+def get_number_of_commits(some_folder_in_root_repo='./'):
+  command = "git shortlog -s -n --all --author=\"$(git config --get user.email)\" | grep -o '[0-9]\+' |  awk '{s+=$1} END {print s}'"
+  return run_command_in_folder(command, some_folder_in_root_repo)
+
+
 def get_linter_subfolder(root_repo_folder):
   """Find the subfolder where this linter is stored."""
   return run_command_in_folder("git submodule | awk '{ print $2 }'" +
@@ -61,7 +67,7 @@ def get_unstaged_files(some_folder_in_root_repo='./'):
   return output.split("\n")
 
 
-def check_cpp_lint(staged_files, cpplint_file):
+def check_cpp_lint(staged_files, cpplint_file, ascii_art):
   """Runs Google's cpplint on all C++ files staged for commit,"""
   cpplint = imp.load_source('cpplint', cpplint_file)
   cpplint._cpplint_state.SetFilters('-legal/copyright')  # pylint: disable=W0212
@@ -112,6 +118,11 @@ def check_cpp_lint(staged_files, cpplint_file):
     print("=" * 80)
     print("Found {} cpplint errors".format(total_error_count))
     print("=" * 80)
+
+    if total_error_count > 50:
+      print(ascii_art.AsciiArt.cthulhu)
+    elif total_error_count > 20:
+      print(ascii_art.AsciiArt.tiger)
     return False
   else:
     return True
@@ -327,7 +338,7 @@ def main():
     run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files)
 
     # Use Google's C++ linter to check for compliance with Google style guide.
-    cpp_lint_success = check_cpp_lint(staged_files, cpplint_file)
+    cpp_lint_success = check_cpp_lint(staged_files, cpplint_file, ascii_art)
 
     # Use pylint to check for comimpliance with Tensofrflow python style guide.
     pylint_success = check_python_lint(repo_root, staged_files, pylint_file)
@@ -339,11 +350,24 @@ def main():
       exit(1)
     else:
 
-      print("=" * 80)
-      print("Commit accepted, well done!")
-      print("=" * 80)
+      commit_number = get_number_of_commits(repo_root)
+      lucky_commit = ((int(commit_number) + 1) % 2 == 0)
 
-      print(ascii_art.AsciiArt.commit_success)
+      if lucky_commit:
+        print(ascii_art.AsciiArt.story)
+
+        print("=" * 80)
+        print("Commit accepted, well done! This is your {}th commit!".format(
+            commit_number))
+        print("This is a lucky commit! Please enjoy this free sheep story.")
+        print("=" * 80)
+      else:
+        print(ascii_art.AsciiArt.commit_success)
+
+        print("=" * 80)
+        print("Commit accepted, well done! This is the {}th commit!".format(
+            commit_number))
+        print("=" * 80)
   else:
     print(ascii_art.AsciiArt.homer_woohoo)
 
