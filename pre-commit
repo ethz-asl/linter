@@ -351,7 +351,7 @@ def main():
     else:
 
       commit_number = get_number_of_commits(repo_root)
-      lucky_commit = ((int(commit_number) + 1) % 2 == 0)
+      lucky_commit = ((int(commit_number) + 1) % 42 == 0)
 
       if lucky_commit:
         print(ascii_art.AsciiArt.story)
