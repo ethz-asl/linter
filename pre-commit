@@ -10,6 +10,8 @@
 from __future__ import print_function
 from random import randint
 
+from pathlib import Path
+
 import datetime
 import imp
 import os
@@ -78,6 +80,10 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art):
 
   total_error_count = 0
   for changed_file in staged_files:
+    changed_file_path = Path(changed_file)
+    if not changed_file_path.exists():
+      print("Skipping file {}".format(changed_file))
+      continue
     if changed_file.lower().endswith(('.cc', '.h', '.cpp', '.cu', '.cuh')):
       # Search iteratively for the root of the catkin package.
       package_root = ''
@@ -208,6 +214,10 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
 
   first_file_formatted = True
   for staged_file in staged_files:
+    staged_file_path = Path(staged_file)
+    if not staged_file_path.exists():
+      print("Skipping file {}".format(staged_file))
+      continue
     if staged_file.endswith((".py")):
 
       # Check if the file needs formatting by applying the formatting and store
@@ -268,6 +278,10 @@ def check_python_lint(repo_root, staged_files, pylint_file):
   # for errors in the code.
   pylint_errors = []
   for changed_file in staged_files:
+    changed_file_path = Path(changed_file)
+    if not changed_file_path.exists():
+      print("Skipping file {}".format(changed_file))
+      continue
     if re.search(r'\.py$', changed_file):
 
       print("Running pylint on \'{}\'".format(repo_root + "/" + changed_file))
