@@ -58,3 +58,7 @@ IncludeCategories:
     Priority:        2
 ...
 ```
+
+#### ASCII-Art Sources
+
+ * [www.retrojunkie.com (accessed through web.archive.org)](https://web.archive.org/web/20150831003349/http://www.retrojunkie.com:80/asciiart/)
