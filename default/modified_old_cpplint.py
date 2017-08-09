@@ -1126,6 +1126,9 @@ def CheckForCopyright(filename, lines, error):
           'No copyright message found.  '
           'You should have a line: "Copyright [year] <Copyright Owner>"')
 
+# NOTE(mfehr): The function 'GetHeaderGuardCPPVariable' was taken from
+#              the new_cpplint.py file
+
 
 def GetHeaderGuardCPPVariable(filename):
   """Returns the CPP variable that should be used as a header guard.
@@ -1143,30 +1146,20 @@ def GetHeaderGuardCPPVariable(filename):
   # flymake.
   filename = re.sub(r'_flymake\.h$', '.h', filename)
   filename = re.sub(r'/\.flymake/([^/]*)$', r'/\1', filename)
+  # Replace 'c++' with 'cpp'.
+  filename = filename.replace('C++', 'cpp').replace('c++', 'cpp')
 
   fileinfo = FileInfo(filename)
   file_path_from_root = fileinfo.RepositoryName()
 
-  # The Project Tango folder structure for headers looks like
-  # PKG_NAME/include/PKG_NAME/header.h. This is different from the
-  # folder layout expected by the Google lint tool. Since every
-  # package in the repository has a unique name, the required
-  # header include guard looks like: PKG_NAME_HEADER_H_.
-  split_file_path = file_path_from_root.split('/')
-  if (len(split_file_path) >= 3 and
-      split_file_path[-2] in ["test", "jni", "impl", "tbb", "src",
-                              "renderables"]):
-    file_path_from_root = '/'.join([split_file_path[-3], split_file_path[-1]])
-  elif len(split_file_path) >= 2 and split_file_path[-2] == "include":
-    # In rare cases, allow header without containing PKG_NAME folder.
-    file_path_from_root = split_file_path[-1]
-  else:
-    if len(split_file_path) >= 2:
-      file_path_from_root = '/'.join(split_file_path[-2:])
-
   if _root:
-    file_path_from_root = re.sub('^' + _root + os.sep, '', file_path_from_root)
-  return re.sub(r'[-./\s]', '_', file_path_from_root).upper() + '_'
+    suffix = os.sep
+    # On Windows using directory separator will leave us with
+    # "bogus escape error" unless we properly escape regex.
+    if suffix == '\\':
+      suffix += '\\'
+    file_path_from_root = re.sub('^' + _root + suffix, '', file_path_from_root)
+  return re.sub(r'[^a-zA-Z0-9]', '_', file_path_from_root).upper() + '_'
 
 
 def CheckForHeaderGuard(filename, lines, error):
