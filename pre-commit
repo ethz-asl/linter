@@ -85,7 +85,8 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
       package_root = ''
       search_dir = os.path.dirname(changed_file)
       found_package_root = False
-      for _ in range(1, 20):
+      MAX_DEPTH_OF_FILES = 100
+      for _ in range(1, MAX_DEPTH_OF_FILES):
         if os.path.isfile(search_dir + '/package.xml'):
           package_root = search_dir
           found_package_root = True
