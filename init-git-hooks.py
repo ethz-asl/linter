@@ -98,9 +98,20 @@ def main():
   # Copy git hooks.
   cp_params = script_directory + "/pre-commit " + repo_root + "/.git/hooks/"
   if subprocess.call("cp " + cp_params, shell=True) != 0:
-    print("Failed to copy githooks to "
+    print("Failed to copy pre-commit githook to "
           "{}...".format((repo_root + "/.git/hooks/")))
     exit(1)
+
+  cp_params = script_directory + "/commit-msg " + repo_root + "/.git/hooks/"
+  if subprocess.call("cp " + cp_params, shell=True) != 0:
+    print("Failed to copy commit-msg githook to "
+          "{}...".format((repo_root + "/.git/hooks/")))
+    exit(1)
+
+  # rm_params = repo_root + "/.git/hooks/commit-msg.sample"
+  # if subprocess.call("rm -rf " + rm_params, shell=True) != 0:
+  #   print("Failed to remove sample git commit-msg githook!")
+  #   exit(1)
 
   print("Success, githooks initialized!")
 

@@ -1,0 +1,61 @@
+#!/bin/bash
+
+commit_message=$1
+
+error_msg="
+======================================================
+  Aborting commit... Is that you Helen?
+  Please formulate a proper commit message!
+======================================================
+"
+
+declare -a bad_words=(
+  "fuck"
+  "fucking"
+  "shit"
+  "shitty"
+  "buggy"
+  "crap"
+  "crappy"
+  "bla"
+  "hacky"
+  "hack"
+  "annoying"
+  "hate"
+  "horrible"
+  "whoops"
+  "whops"
+  "bunch-o-bugs"
+  "dumb"
+  "mess"
+  "seriously"
+  "terrible"
+  "WIP"
+  "!!"
+  "!!!"
+  "??"
+  "???"
+)
+
+bad_words_found=""
+for badword in "${bad_words[@]}"
+do
+  grep_command="echo $commit_message | grep -iswoh '${badword}'"
+  grep_result=$(eval $grep_command)
+  if [[ ! -z "${grep_result// }" ]]; then
+    grep_result=$(echo "$grep_result"|tr '\n' ', ')
+    bad_words_found="${grep_result} ${bad_words_found}"
+  fi
+done
+
+if [[ ! -z "${bad_words_found// }" ]]; then
+  echo -e "\nFound the following bad words in the commit message: \n\n\t${bad_words_found}\n"
+  printf "$error_msg"
+  exit 1
+else
+  echo "Commit message accepted. msg: '$commit_message'"
+  echo "2: '$2'"
+  echo "3: '$3'"
+  echo "4: '$4'"
+fi
+exit 0
