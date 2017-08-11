@@ -4,7 +4,7 @@ commit_message=$(cat $1)
 
 error_msg="
 ======================================================
-  Aborting commit... Is that you Helen?
+  Aborting commit... Is that you, E.O.?
   Please formulate a proper commit message!
 ======================================================
 "
