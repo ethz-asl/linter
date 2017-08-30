@@ -17,7 +17,7 @@ cpplint_url = "https://raw.githubusercontent.com/google/styleguide/gh-pages/cppl
 
 Set this variable to use the local modified copy of the newest cpplint script:
 
-default_cpplint = "new_cpplint.py"
+default_cpplint = "cpplint.py"
 """
 
 import os
@@ -26,7 +26,7 @@ import shutil
 import subprocess
 import sys
 
-default_cpplint = "modified_old_cpplint.py"
+default_cpplint = "modified_cpplint.py"
 
 cpplint_url = ""
 pylint_url = "https://raw.githubusercontent.com/vinitkumar/googlecl/6dc04b489dba709c53d2f4944473709617506589/googlecl-pylint.rc"

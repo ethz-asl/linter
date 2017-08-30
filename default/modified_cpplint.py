@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 #
 # Copyright (c) 2009 Google Inc. All rights reserved.
 #
@@ -259,7 +259,7 @@ _ERROR_CATEGORIES = [
     'whitespace/parens',
     'whitespace/semicolon',
     'whitespace/tab',
-    'whitespace/todo',
+    'whitespace/todo'
 ]
 
 # These error categories are no longer enforced by cpplint, but for backwards-
@@ -801,6 +801,9 @@ class _IncludeState(object):
     return True
 
   def CheckNextIncludeOrder(self, header_type):
+    # NOTE(mfehr): We follow a different policy, abort here.
+    return ''
+
     """Returns a non-empty error message if the next header is out of order.
 
     This function also updates the internal state to be ready to check
@@ -2502,7 +2505,6 @@ class NestingState(object):
         # TODO(unknown): unexpected #endif, issue warning?
         pass
 
-  # TODO(unknown): Update() is too long, but we will refactor later.
   def Update(self, filename, clean_lines, linenum, error):
     """Update nesting state with current line.
 
