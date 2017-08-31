@@ -58,7 +58,8 @@ def get_unstaged_files(some_folder_in_root_repo='./'):
 def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
   """Runs Google's cpplint on all C++ files staged for commit,"""
   cpplint = imp.load_source('cpplint', cpplint_file)
-  cpplint._cpplint_state.SetFilters('-legal/copyright')  # pylint: disable=W0212
+  cpplint._cpplint_state.SetFilters(
+      '-legal/copyright,-build/c++11')  # pylint: disable=W0212
 
   # Prevent cpplint from writing to stdout directly, instead
   # the errors will be stored in pplint.output as (line, message) tuples.
