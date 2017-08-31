@@ -33,21 +33,9 @@ def run_command_in_folder(command, folder):
   return command_output
 
 
-def get_git_repo_root(some_folder_in_root_repo='./'):
-  """Get the root folder of the current git repository."""
-  return run_command_in_folder('git rev-parse --show-toplevel',
-                               some_folder_in_root_repo)
-
-
 def get_number_of_commits(some_folder_in_root_repo='./'):
   command = "git shortlog -s -n --all --author=\"$(git config --get user.email)\" | grep -o '[0-9]\+' |  awk '{s+=$1} END {print s}'"
   return run_command_in_folder(command, some_folder_in_root_repo)
-
-
-def get_linter_subfolder(root_repo_folder):
-  """Find the subfolder where this linter is stored."""
-  return run_command_in_folder("git submodule | awk '{ print $2 }'" +
-                               " | grep linter", root_repo_folder)
 
 
 def get_staged_files(some_folder_in_root_repo='./'):
@@ -301,14 +289,8 @@ def check_python_lint(repo_root, staged_files, pylint_file):
     return True
 
 
-def main():
+def linter_check(repo_root, linter_subfolder):
   """ Main pre-commit function for calling code checking script. """
-
-  # Get git root folder.
-  repo_root = get_git_repo_root()
-
-  # Get linter subfolder
-  linter_subfolder = get_linter_subfolder(repo_root)
 
   cpplint_file = repo_root + "/" + linter_subfolder + "/cpplint.py"
   pylint_file = repo_root + "/" + linter_subfolder + "/pylint.rc"
@@ -378,7 +360,3 @@ def main():
         print("=" * 80)
   else:
     print(ascii_art.AsciiArt.homer_woohoo)
-
-
-if __name__ == "__main__":
-  main()
