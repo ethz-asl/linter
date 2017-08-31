@@ -96,7 +96,8 @@ def main():
   repo_root = get_git_repo_root(script_directory + '/../')
 
   # Copy git hooks.
-  cp_params = script_directory + "/pre-commit " + repo_root + "/.git/hooks/"
+  cp_params = script_directory + "/git-hooks.py " + \
+      repo_root + "/.git/hooks/pre-commit"
   if subprocess.call("cp " + cp_params, shell=True) != 0:
     print("Failed to copy githooks to "
           "{}...".format((repo_root + "/.git/hooks/")))
