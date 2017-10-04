@@ -27,14 +27,14 @@ This repo contains a generic (C++, python) linter and auto formatter package tha
 
 ```bash
 cd $YOUR_REPO
-git add submodule git@github.com:ethz-asl/linter.git
+git submodule add git@github.com:ethz-asl/linter.git
 ./linter/init-git-hooks.py
 ```
 
 You can also add the linter submodule in a subfolder of your repo, e.g.:
 ```bash
 mkdir $YOUR_REPO/dev_tools
-git add submodule git@github.com:ethz-asl/linter.git dev_tools/linter
+git submodule add git@github.com:ethz-asl/linter.git dev_tools/linter
 ./dev_tools/linter/init-git-hooks.py
 ```
 
