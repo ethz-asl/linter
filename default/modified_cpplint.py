@@ -4841,15 +4841,17 @@ def CheckGlobalStatic(filename, clean_lines, linenum, error):
       not Search(r'\bstring\b(\s+const)?\s*[\*\&]\s*(const\s+)?\w', line) and
       not Search(r'\boperator\W', line) and
           not Match(r'\s*(<.*>)?(::[a-zA-Z0-9_]+)*\s*\(([^"]|$)', match.group(4))):
-    if not Search(r'\bconst\b', line):
-      # Deliberately allowing const std::string for convenience.
-      #error(filename, linenum, 'runtime/string', 4,
-      #      'For a static/global string constant, use a C style string '
-      #      'instead: "%schar%s %s[]".' %
-      #      (match.group(1), match.group(2) or '', match.group(3)))
-    #else:
-      error(filename, linenum, 'runtime/string', 4,
-            'Static/global string variables are not permitted.')
+
+  # NOTE(mfehr): Deliberately allowing const std::string for convenience.
+  # if Search(r'\bconst\b', line):
+  #   error(filename, linenum, 'runtime/string', 4,
+  #         'For a static/global string constant, use a C style string '
+  #         'instead: "%schar%s %s[]".' %
+  #         (match.group(1), match.group(2) or '', match.group(3)))
+  # else:
+  if not Search(r'\bconst\b', line):
+    error(filename, linenum, 'runtime/string', 4,
+          'Static/global string variables are not permitted.')
 
   if (Search(r'\b([A-Za-z0-9_]*_)\(\1\)', line) or
           Search(r'\b([A-Za-z0-9_]*_)\(CHECK_NOTNULL\(\1\)\)', line)):
