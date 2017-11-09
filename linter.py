@@ -35,7 +35,10 @@ def run_command_in_folder(command, folder):
 
 def get_number_of_commits(some_folder_in_root_repo='./'):
   command = "git shortlog -s -n --all --author=\"$(git config --get user.email)\" | grep -o '[0-9]\+' |  awk '{s+=$1} END {print s}'"
-  return run_command_in_folder(command, some_folder_in_root_repo)
+  num_commits = run_command_in_folder(command, some_folder_in_root_repo)
+  if not num_commits:
+    num_commits = "0"
+  return num_commits
 
 
 def get_staged_files(some_folder_in_root_repo='./'):
