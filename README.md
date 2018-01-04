@@ -7,7 +7,7 @@ This repo contains a (C++, python (experimental)) linter and auto formatter pack
    * **clang-format** Formats your code based on your .clang-format preferences.
    * **cpplint** Checks your C++ code for style errors and warnings.
    
- * **EXPERIMENTAL - **Python** files:**
+ * **EXPERIMENTAL - Python** files:
 
       **WARNING:** The default linter settings are very strict and might not actually conform with the formatting produced by autopep8. If you want to use this linter for python you will need to do some tweaking.
       * **autopep8** Formats your python code.
