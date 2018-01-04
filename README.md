@@ -1,14 +1,18 @@
 # linter
 
-This repo contains a generic (C++, python) linter and auto formatter package that can be included into your repository as a submodule. It provides the following git hooks:
+This repo contains a (C++, python (experimental)) linter and auto formatter package that can be included into your repository as a submodule. It provides the following git hooks:
  * **General**
    * Prevent commits to master.
  * **C++** files:
    * **clang-format** Formats your code based on your .clang-format preferences.
    * **cpplint** Checks your C++ code for style errors and warnings.
- * **Python** files:
-   * **autopep8** Formats your python code.
-   * **pylint** Checks your Python code for style errors and warnings.
+   
+ * **EXPERIMENTAL - **Python** files:**
+
+      **WARNING:** The default linter settings are very strict and might not actually conform with the formatting produced by autopep8. If you want to use this linter for python you will need to do some tweaking.
+      * **autopep8** Formats your python code.
+      * **pylint** Checks your Python code for style errors and warnings.
+     
 
 ## Dependencies
 
