@@ -75,7 +75,7 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
     if changed_file.lower().endswith(('.cc', '.h', '.cpp', '.cu', '.cuh')):
       # Search iteratively for the root of the catkin package.
       package_root = ''
-      search_dir = os.path.dirname(changed_file)
+      search_dir = os.path.dirname(os.path.abspath(changed_file))
       found_package_root = False
       MAX_DEPTH_OF_FILES = 100
       for _ in range(1, MAX_DEPTH_OF_FILES):
@@ -86,7 +86,7 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
         # Stop if the root of the git repo is reached.
         if os.path.isdir(search_dir + '/.git'):
           break
-        search_dir += '/..'
+        search_dir = os.path.dirname(search_dir)
       assert found_package_root, ("Could not find the root of the "
                                   "catkin package that contains: "
                                   "{}".format(changed_file))
