@@ -26,8 +26,7 @@ DEFAULT_CONFIG = {
     'use_cpplint':      True,
     # Disable Python checks by default.
     'use_autopep8':     False,
-    'use_pylint':  False,
-
+    'use_pylint':       False
 }
 
 
