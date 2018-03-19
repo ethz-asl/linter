@@ -1,0 +1,5 @@
+# Turn the components of the linter individualy on / off.
+clangformat: on
+cpplint: on
+autopep8: off
+pylint: off

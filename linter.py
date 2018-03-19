@@ -16,10 +16,38 @@ import os
 import pylint.lint
 import re
 import subprocess
+import yaml
 
 CLANG_FORMAT_DIFF_EXECUTABLE = "clang-format-diff-3.8"
 AUTOPEP8_FORMAT_EXECUTABLE = "autopep8"
 
+DEFAULT_CONFIG = {
+    'use_clangformat':  True,
+    'use_cpplint':      True,
+    # Disable Python checks by default.
+    'use_autopep8':     False,
+    'use_pylint':  False,
+
+}
+
+
+def read_linter_config(filename):
+    """Parses yaml config file."""
+
+    config = DEFAULT_CONFIG
+    with open(filename, 'r') as ymlfile:
+        parsed_config = yaml.load(ymlfile)
+
+    if 'clangformat' in parsed_config.keys():
+        config['use_clangformat'] = parsed_config['clangformat']
+    if 'cpplint' in parsed_config.keys():
+        config['use_cpplint'] = parsed_config['cpplint']
+    if 'autopep8' in parsed_config.keys():
+        config['use_autopep8'] = parsed_config['autopep8']
+    if 'pylint' in parsed_config.keys():
+        config['use_pylint'] = parsed_config['pylint']
+
+    return config
 
 def run_command_in_folder(command, folder):
   """Run a bash command in a specific folder."""
@@ -303,6 +331,14 @@ def linter_check(repo_root, linter_subfolder):
   pylint_file = repo_root + "/" + linter_subfolder + "/pylint.rc"
   ascii_art_file = repo_root + "/" + linter_subfolder + "/ascii_art.py"
 
+  # Read linter config file.
+  linter_config_file = repo_root + '/linterconfig.yaml'
+  if os.path.isfile(repo_root + '/linterconfig.yaml'):
+      print("Found repo linter config: {}".format(linter_config_file))
+      linter_config = read_linter_config(linter_config_file)
+  else:
+      linter_config = DEFAULT_CONFIG
+
   print("Found linter subfolder: {}".format(linter_subfolder))
   print("Found ascii art file at: {}".format(ascii_art_file))
   print("Found cpplint file at: {}".format(cpplint_file))
@@ -326,19 +362,30 @@ def linter_check(repo_root, linter_subfolder):
     exit(1)
 
   if not check_if_merge_commit(repo_root):
-    # Do not allow commiting files that were modified after staging.This
+    # Do not allow commiting files that were modified after staging. This
     # avoids problems such as forgetting to stage fixes of cpplint complaints.
     list_of_changed_staged_files = check_modified_after_staging(staged_files)
 
-    run_clang_format(repo_root, staged_files, list_of_changed_staged_files)
-    run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files)
+    if linter_config['use_clangformat']:
+      run_clang_format(repo_root, staged_files, list_of_changed_staged_files)
+
+    if linter_config['use_autopep8']:
+      run_autopep8_format(repo_root, staged_files,
+                          list_of_changed_staged_files)
+
 
     # Use Google's C++ linter to check for compliance with Google style guide.
-    cpp_lint_success = check_cpp_lint(
-        staged_files, cpplint_file, ascii_art, repo_root)
+    if linter_config['use_cpplint']:
+      cpp_lint_success = check_cpp_lint(
+          staged_files, cpplint_file, ascii_art, repo_root)
+    else:
+        cpp_lint_success = True
 
     # Use pylint to check for comimpliance with Tensofrflow python style guide.
-    pylint_success = check_python_lint(repo_root, staged_files, pylint_file)
+    if linter_config['use_pylint']:
+      pylint_success = check_python_lint(repo_root, staged_files, pylint_file)
+    else:
+      pylint_success = True
 
     if not(cpp_lint_success and pylint_success):
       print("=" * 80)
