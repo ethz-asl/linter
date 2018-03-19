@@ -31,22 +31,22 @@ DEFAULT_CONFIG = {
 
 
 def read_linter_config(filename):
-    """Parses yaml config file."""
+  """Parses yaml config file."""
 
-    config = DEFAULT_CONFIG
-    with open(filename, 'r') as ymlfile:
-        parsed_config = yaml.load(ymlfile)
+  config = DEFAULT_CONFIG
+  with open(filename, 'r') as ymlfile:
+    parsed_config = yaml.load(ymlfile)
 
-    if 'clangformat' in parsed_config.keys():
-        config['use_clangformat'] = parsed_config['clangformat']
-    if 'cpplint' in parsed_config.keys():
-        config['use_cpplint'] = parsed_config['cpplint']
-    if 'autopep8' in parsed_config.keys():
-        config['use_autopep8'] = parsed_config['autopep8']
-    if 'pylint' in parsed_config.keys():
-        config['use_pylint'] = parsed_config['pylint']
+  if 'clangformat' in parsed_config.keys():
+    config['use_clangformat'] = parsed_config['clangformat']
+  if 'cpplint' in parsed_config.keys():
+    config['use_cpplint'] = parsed_config['cpplint']
+  if 'autopep8' in parsed_config.keys():
+    config['use_autopep8'] = parsed_config['autopep8']
+  if 'pylint' in parsed_config.keys():
+    config['use_pylint'] = parsed_config['pylint']
 
-    return config
+  return config
 
 def run_command_in_folder(command, folder):
   """Run a bash command in a specific folder."""
