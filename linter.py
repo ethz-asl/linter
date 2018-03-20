@@ -374,9 +374,9 @@ def linter_check(repo_root, linter_subfolder):
     print("=" * 80)
     exit(1)
 
-  if len(config['whitelist']) > 0:
+  if len(linter_config['whitelist']) > 0:
       whitelisted_files = get_whitelisted_files(repo_root, staged_files,
-                                                config['whitelist'])
+                                                linter_config['whitelist'])
 
   # Load ascii art.
   ascii_art = imp.load_source('ascii_art', ascii_art_file)
