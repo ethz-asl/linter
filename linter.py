@@ -340,8 +340,10 @@ def get_whitelisted_files(repo_root, files, whitelist):
       # Check if the file itself or its parent directory is in the whitelist.
       if (file == entry
           or os.path.commonprefix([file, entry]) == entry):
-        whitelist.append(file)
+        whitelisted.append(file)
         break
+
+  return whitelisted
 
 
 def linter_check(repo_root, linter_subfolder):
@@ -374,9 +376,11 @@ def linter_check(repo_root, linter_subfolder):
     print("=" * 80)
     exit(1)
 
-  if len(config['whitelist']) > 0:
-      whitelisted_files = get_whitelisted_files(repo_root, staged_files,
-                                                config['whitelist'])
+  if len(linter_config['whitelist']) > 0:
+    whitelisted_files = get_whitelisted_files(repo_root, staged_files,
+                                              linter_config['whitelist'])
+  else:
+    whitelisted_files = staged_files
 
   # Load ascii art.
   ascii_art = imp.load_source('ascii_art', ascii_art_file)
