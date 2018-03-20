@@ -1,0 +1,12 @@
+# Turn the components of the linter individualy on / off.
+clangformat: on
+cpplint: on
+autopep8: off
+pylint: off
+
+# If this whitelist block is present, the linter only operates on the files and
+# directories listed in this whitelist.
+whitelist:
+ - rel/path/to/file.py
+ - another_file.py
+ - some/directory
