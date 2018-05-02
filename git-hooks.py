@@ -29,7 +29,7 @@ def get_linter_folder(root_repo_folder):
         "git submodule | awk '{ print $2 }'" + " | grep linter",
         root_repo_folder)
     if len(linter_subfolder) != 0:
-        return os.path.join(repo_root_folder, linter_subfolder)
+        return os.path.join(root_repo_folder, linter_subfolder)
 
     # Try catkin package.
     linter_subfolder = run_command_in_folder("catkin_find linter | grep src",
