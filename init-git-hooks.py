@@ -52,6 +52,7 @@ def get_git_repo_root(some_folder_in_root_repo='./'):
 
   stdout, _ = get_repo_call.communicate()
   repo_root = stdout.rstrip()
+  print 'repo root:', repo_root
   return repo_root
 
 
@@ -65,6 +66,7 @@ def main():
   """ Download cpplint.py and pylint.py and installs the git hooks"""
   script_directory = os.path.dirname(sys.argv[0])
   script_directory = os.path.abspath(script_directory)
+  print 'script dir:', script_directory
 
   if cpplint_url != "":
     # Download linter files.
@@ -93,7 +95,7 @@ def main():
     exit(1)
 
   # Get git root folder of parent repository.
-  repo_root = get_git_repo_root(script_directory + '/../')
+  repo_root = get_git_repo_root('.')
 
   # Copy git hooks.
   cp_params = script_directory + "/git-hooks.py " + \

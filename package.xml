@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>linter</name>
+  <version>0.0.0</version>
+  <description>A linter for C++ and Python.</description>
+  <maintainer email="maplab-dev@mavt.ethz.ch">maplab-developers</maintainer>
+  <license>BSD-3</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+</package>

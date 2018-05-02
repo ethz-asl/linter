@@ -346,12 +346,12 @@ def get_whitelisted_files(repo_root, files, whitelist):
   return whitelisted
 
 
-def linter_check(repo_root, linter_subfolder):
+def linter_check(repo_root, linter_folder):
   """ Main pre-commit function for calling code checking script. """
 
-  cpplint_file = repo_root + "/" + linter_subfolder + "/cpplint.py"
-  pylint_file = repo_root + "/" + linter_subfolder + "/pylint.rc"
-  ascii_art_file = repo_root + "/" + linter_subfolder + "/ascii_art.py"
+  cpplint_file =  linter_folder + "/cpplint.py"
+  pylint_file =  linter_folder + "/pylint.rc"
+  ascii_art_file =  linter_folder + "/ascii_art.py"
 
   # Read linter config file.
   linter_config_file = repo_root + '/linterconfig.yaml'
@@ -361,7 +361,7 @@ def linter_check(repo_root, linter_subfolder):
   else:
       linter_config = DEFAULT_CONFIG
 
-  print("Found linter subfolder: {}".format(linter_subfolder))
+  print("Found linter subfolder: {}".format(linter_folder))
   print("Found ascii art file at: {}".format(ascii_art_file))
   print("Found cpplint file at: {}".format(cpplint_file))
   print("Found pylint file at: {}".format(pylint_file))
