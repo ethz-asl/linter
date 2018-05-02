@@ -20,6 +20,8 @@ Set this variable to use the local modified copy of the newest cpplint script:
 default_cpplint = "cpplint.py"
 """
 
+from __future__ import print_function
+
 import os
 import requests
 import shutil
@@ -52,7 +54,6 @@ def get_git_repo_root(some_folder_in_root_repo='./'):
 
   stdout, _ = get_repo_call.communicate()
   repo_root = stdout.rstrip()
-  print 'repo root:', repo_root
   return repo_root
 
 
@@ -66,7 +67,6 @@ def main():
   """ Download cpplint.py and pylint.py and installs the git hooks"""
   script_directory = os.path.dirname(sys.argv[0])
   script_directory = os.path.abspath(script_directory)
-  print 'script dir:', script_directory
 
   if cpplint_url != "":
     # Download linter files.
