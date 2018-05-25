@@ -211,7 +211,7 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
 
   run_command_in_folder("git diff -U0 --cached | " +
                         CLANG_FORMAT_DIFF_EXECUTABLE +
-                        " --style=file -p1 > " +
+                        " -style=file -p1 > " +
                         clang_format_path, repo_root)
 
   if not os.stat(clang_format_path).st_size == 0:
@@ -248,7 +248,7 @@ def run_yapf_format(repo_root, staged_files, list_of_changed_staged_files):
                               os.path.basename(os.path.normpath(repo_root)) +
                               "_" + datetime.datetime.now().isoformat() +
                               ".yapf.patch")
-      task = (YAPF_FORMAT_EXECUTABLE + " -style google -d " + staged_file +
+      task = (YAPF_FORMAT_EXECUTABLE + " --style google -d " + staged_file +
               " > " + yapf_format_path)
       run_command_in_folder(task, repo_root)
 
