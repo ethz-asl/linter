@@ -211,7 +211,7 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
 
   run_command_in_folder("git diff -U0 --cached | " +
                         CLANG_FORMAT_DIFF_EXECUTABLE +
-                        " -style=file -p1 > " +
+                        " --style=file -p1 > " +
                         clang_format_path, repo_root)
 
   if not os.stat(clang_format_path).st_size == 0:
