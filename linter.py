@@ -25,8 +25,8 @@ DEFAULT_CONFIG = {
   'use_clangformat':  True,
   'use_cpplint':      True,
   # Disable Python checks by default.
-  'use_yapf':         False,
-  'use_pylint':       False,
+  'use_yapf':         True,
+  'use_pylint':       True,
   # Check all staged files by default.
   'whitelist':        []
 }
