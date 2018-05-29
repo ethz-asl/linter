@@ -20,6 +20,8 @@ Set this variable to use the local modified copy of the newest cpplint script:
 default_cpplint = "cpplint.py"
 """
 
+from __future__ import print_function
+
 import os
 import requests
 import shutil
@@ -63,7 +65,7 @@ def command_exists(cmd):
 def main():
   """ Download cpplint.py and pylint.py and installs the git hooks"""
   script_directory = os.path.dirname(sys.argv[0])
-  script_directory = os.path.abspath(script_directory)
+  script_directory = os.path.dirname(os.path.abspath(script_directory))
 
   if cpplint_url != "":
     # Download linter files.
@@ -101,7 +103,7 @@ def main():
     exit(1)
 
   # Get git root folder of parent repository.
-  repo_root = get_git_repo_root(script_directory + '/../')
+  repo_root = get_git_repo_root('.')
 
   # Copy git hooks.
   cp_params = script_directory + "/git-hooks.py " + \

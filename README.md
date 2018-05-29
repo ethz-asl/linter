@@ -29,16 +29,17 @@ This repo contains a (C++, python (experimental)) linter and auto formatter pack
 ## Installation
 
 ```bash
-cd $YOUR_REPO
-git submodule add git@github.com:ethz-asl/linter.git
-./linter/init-git-hooks.py
+git clone git@github.com:ethz-asl/linter.git
+cd linter
+echo ". $(realpath setup_linter.sh)" >> ~/.bashrc  # Or the matching file for
+                                                   # your shell.
+source ~/.bashrc
 ```
 
-You can also add the linter submodule in a subfolder of your repo, e.g.:
+The you can install the linter in your repository:
 ```bash
-mkdir $YOUR_REPO/dev_tools
-git submodule add git@github.com:ethz-asl/linter.git dev_tools/linter
-./dev_tools/linter/init-git-hooks.py
+cd $YOUR_REPO
+init_linter_git_hooks
 ```
 
 Define the project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example:
