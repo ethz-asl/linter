@@ -21,7 +21,6 @@ def run_command_in_folder(command, folder):
 
 def get_git_repo_root(some_folder_in_root_repo='./'):
     """Get the root folder of the current git repository."""
-    print('git folder to check:', some_folder_in_root_repo)
     return run_command_in_folder('git rev-parse --show-toplevel',
                                  some_folder_in_root_repo)
 
