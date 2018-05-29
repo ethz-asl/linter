@@ -22,6 +22,7 @@ default_cpplint = "cpplint.py"
 
 from __future__ import print_function
 
+import argparse
 import os
 import requests
 import shutil
@@ -63,7 +64,21 @@ def command_exists(cmd):
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
-def main():
+def get_hooks_folder_for_repo():
+  # Get git root folder of parent repository.
+  repo_root = get_git_repo_root('.')
+  hooks_folder = os.path.join(repo_root, '.git/hooks')
+  if os.path.isfile(os.path.join(repo_root, '.git')):
+    # Git repo is a submodule, git information is in a folder listed in the .git
+    # file.
+    with open(os.path.join(repo_root, '.git'), 'r') as git_info_file:
+      git_folder = yaml.load(git_info_file)['gitdir']
+    repo_root = get_git_repo_root(os.path.join(repo_root, git_folder))
+    hooks_folder = os.path.join(repo_root, git_folder, 'hooks')
+  return hooks_folder
+
+
+def install_linter():
   """ Download cpplint.py and pylint.py and installs the git hooks"""
   script_directory = os.path.dirname(sys.argv[0])
   script_directory = os.path.dirname(os.path.abspath(script_directory))
@@ -103,18 +118,8 @@ def main():
     print("ERROR: yapf is not installed! Try: pip install yapf")
     exit(1)
 
-  # Get git root folder of parent repository.
-  repo_root = get_git_repo_root('.')
-  hooks_folder = os.path.join(repo_root, '.git/hooks')
-  if os.path.isfile(os.path.join(repo_root, '.git')):
-    # Git repo is a submodule, git information is in a folder listed in the .git
-    # file.
-    with open(os.path.join(repo_root, '.git'), 'r') as git_info_file:
-      git_folder = yaml.load(git_info_file)['gitdir']
-    repo_root = get_git_repo_root(os.path.join(repo_root, git_folder))
-    hooks_folder = os.path.join(repo_root, git_folder, 'hooks')
-
   # Copy git hooks.
+  hooks_folder = get_hooks_folder_for_repo()
   cp_params = script_directory + "/git_hooks.py " + \
       hooks_folder + "/pre-commit"
   if subprocess.call("cp " + cp_params, shell=True) != 0:
@@ -123,6 +128,31 @@ def main():
     exit(1)
 
   print("Success, githooks initialized!")
+
+
+def remove_linter():
+  hooks_folder = get_hooks_folder_for_repo()
+  pre_commit_file = os.path.join(hooks_folder, 'pre-commit')
+  with open(pre_commit_file, 'w+') as out_file:
+    out_file.write('#!/bin/sh\n')
+  # subprocess.call('chmod +x'
+  print("Linter githooks removed!")
+
+
+def main():
+  arg_parser = argparse.ArgumentParser()
+  arg_parser.add_argument(
+      '--remove',
+      '-r',
+      dest='remove_linter',
+      action="store_true",
+      help='Remove the linter from this repository.')
+  args = arg_parser.parse_args()
+
+  if args.remove_linter:
+    remove_linter()
+  else:
+    install_linter()
 
 
 if __name__ == "__main__":
