@@ -20,6 +20,8 @@ Set this variable to use the local modified copy of the newest cpplint script:
 default_cpplint = "cpplint.py"
 """
 
+from __future__ import print_function
+
 import os
 import requests
 import shutil
@@ -101,7 +103,7 @@ def main():
     exit(1)
 
   # Get git root folder of parent repository.
-  repo_root = get_git_repo_root(script_directory + '/../')
+  repo_root = get_git_repo_root('.')
 
   # Copy git hooks.
   cp_params = script_directory + "/git-hooks.py " + \
