@@ -142,8 +142,8 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
           os.path.abspath(repo_root), os.path.abspath(package_root)])
       package_root = os.path.relpath(package_root, common_prefix)
 
-      # The package root needs to be relative to the repo root. Otherwise the
-      # header guard logic will fail!.
+      # The package root needs to be relative to the (top-level) repo root.
+      # Otherwise the header guard logic will fail!
       cpplint._root = package_root + '/include'   # pylint: disable=W0212
 
       # Reset error count and messages:
@@ -354,7 +354,7 @@ def get_whitelisted_files(repo_root, files, whitelist):
     for entry in whitelist:
       # Add trailing slash if its a directory and no slash is already there.
       if os.path.isdir(repo_root + '/' + entry):
-        entry = os.path.join(os.path.normpath(entry), '')
+          entry = os.path.join(os.path.normpath(entry), '')
 
       # Check if the file itself or its parent directory is in the whitelist.
       if (file == entry
@@ -375,10 +375,10 @@ def linter_check(repo_root, linter_subfolder):
   # Read linter config file.
   linter_config_file = repo_root + '/linterconfig.yaml'
   if os.path.isfile(repo_root + '/linterconfig.yaml'):
-    print("Found repo linter config: {}".format(linter_config_file))
-    linter_config = read_linter_config(linter_config_file)
+      print("Found repo linter config: {}".format(linter_config_file))
+      linter_config = read_linter_config(linter_config_file)
   else:
-    linter_config = DEFAULT_CONFIG
+      linter_config = DEFAULT_CONFIG
 
   print("Found linter subfolder: {}".format(linter_subfolder))
   print("Found ascii art file at: {}".format(ascii_art_file))
@@ -428,7 +428,7 @@ def linter_check(repo_root, linter_subfolder):
       cpp_lint_success = check_cpp_lint(
           whitelisted_files, cpplint_file, ascii_art, repo_root)
     else:
-      cpp_lint_success = True
+        cpp_lint_success = True
 
     # Use pylint to check for comimpliance with Tensofrflow python style guide.
     if linter_config['use_pylint']:

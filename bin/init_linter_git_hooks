@@ -54,7 +54,7 @@ def get_git_repo_root(some_folder_in_root_repo='./'):
 
   stdout, _ = get_repo_call.communicate()
   repo_root = stdout.rstrip()
-  return repo_root, os.path.basename(repo_root)
+  return repo_root
 
 
 def command_exists(cmd):
@@ -104,12 +104,14 @@ def main():
     exit(1)
 
   # Get git root folder of parent repository.
-  repo_root, repo_folder_name = get_git_repo_root('.')
+  repo_root = get_git_repo_root('.')
   hooks_folder = os.path.join(repo_root, '.git/hooks')
   if os.path.isfile(os.path.join(repo_root, '.git')):
+    # Git repo is a submodule, git information is in a folder listed in the .git
+    # file.
     with open(os.path.join(repo_root, '.git'), 'r') as git_info_file:
       git_folder = yaml.load(git_info_file)['gitdir']
-    repo_root, _ = get_git_repo_root(os.path.join(repo_root, git_folder))
+    repo_root = get_git_repo_root(os.path.join(repo_root, git_folder))
     hooks_folder = os.path.join(repo_root, git_folder, 'hooks')
 
   # Copy git hooks.
