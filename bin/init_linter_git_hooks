@@ -135,7 +135,6 @@ def remove_linter():
   pre_commit_file = os.path.join(hooks_folder, 'pre-commit')
   with open(pre_commit_file, 'w+') as out_file:
     out_file.write('#!/bin/sh\n')
-  # subprocess.call('chmod +x'
   print("Linter githooks removed!")
 
 
