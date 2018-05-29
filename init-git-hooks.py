@@ -29,7 +29,6 @@ import sys
 default_cpplint = "modified_cpplint.py"
 
 cpplint_url = ""
-pylint_url = "https://raw.githubusercontent.com/vinitkumar/googlecl/6dc04b489dba709c53d2f4944473709617506589/googlecl-pylint.rc"
 
 clang_format_diff_executable = "clang-format-diff-3.8"
 
@@ -79,7 +78,16 @@ def main():
       print("Failed to copy default cpplint.")
       exit(1)
 
-  download_file_from_url(pylint_url, script_directory + "/pylint.rc")
+  default_pylint_file = os.path.join(script_directory, 'default', 'pylint.rc')
+  if not os.path.isfile(default_pylint_file):
+    print("Default pylint.rc wasn't found under", default_pylint_file)
+    exit(1)
+
+  cp_params = (default_pylint_file + " " + os.path.join(script_directory, 'pylint.rc'))
+  if subprocess.call("cp " + cp_params, shell=True) != 0:
+    print("Failed to copy default pylint.rc.")
+    exit(1)
+
   if not os.path.isfile(script_directory + "/pylint.rc"):
     print("ERROR: Could not download pylint.rc file!")
     exit(1)
@@ -88,8 +96,8 @@ def main():
     print("ERROR: " + clang_format_diff_executable + " is not installed!")
     exit(1)
 
-  if not command_exists("autopep8"):
-    print("ERROR: autopep8 is not installed! Try: pip install autopep8")
+  if not command_exists("yapf"):
+    print("ERROR: yapf is not installed! Try: pip install yapf")
     exit(1)
 
   # Get git root folder of parent repository.

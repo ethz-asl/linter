@@ -19,14 +19,14 @@ import subprocess
 import yaml
 
 CLANG_FORMAT_DIFF_EXECUTABLE = "clang-format-diff-3.8"
-AUTOPEP8_FORMAT_EXECUTABLE = "autopep8"
+YAPF_FORMAT_EXECUTABLE = "yapf"
 
 DEFAULT_CONFIG = {
   'use_clangformat':  True,
   'use_cpplint':      True,
   # Disable Python checks by default.
-  'use_autopep8':     False,
-  'use_pylint':       False,
+  'use_yapf':         True,
+  'use_pylint':       True,
   # Check all staged files by default.
   'whitelist':        []
 }
@@ -43,8 +43,8 @@ def read_linter_config(filename):
     config['use_clangformat'] = parsed_config['clangformat']
   if 'cpplint' in parsed_config.keys():
     config['use_cpplint'] = parsed_config['cpplint']
-  if 'autopep8' in parsed_config.keys():
-    config['use_autopep8'] = parsed_config['autopep8']
+  if 'yapf' in parsed_config.keys():
+    config['use_yapf'] = parsed_config['yapf']
   if 'pylint' in parsed_config.keys():
     config['use_pylint'] = parsed_config['pylint']
   if 'whitelist' in parsed_config.keys():
@@ -233,8 +233,8 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
   return True
 
 
-def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
-  """Runs autopep8 format on all python files staged for commit."""
+def run_yapf_format(repo_root, staged_files, list_of_changed_staged_files):
+  """Runs yapf format on all python files staged for commit."""
 
   first_file_formatted = True
   for staged_file in staged_files:
@@ -244,17 +244,15 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
 
       # Check if the file needs formatting by applying the formatting and store
       # the results into a patch file.
-      autopep8_format_path = ("/tmp/" +
+      yapf_format_path = ("/tmp/" +
                               os.path.basename(os.path.normpath(repo_root)) +
                               "_" + datetime.datetime.now().isoformat() +
-                              ".autopep8.patch")
-      task = (AUTOPEP8_FORMAT_EXECUTABLE +
-              " -d --aggressive --aggressive --max-line-length=80 " +
-              "--indent-size=2 --ignore=E24 " +
-              staged_file + " > " + autopep8_format_path)
+                              ".yapf.patch")
+      task = (YAPF_FORMAT_EXECUTABLE + " --style pep8 -d " + staged_file +
+              " > " + yapf_format_path)
       run_command_in_folder(task, repo_root)
 
-      if not os.stat(autopep8_format_path).st_size == 0:
+      if not os.stat(yapf_format_path).st_size == 0:
         if first_file_formatted:
           print("=" * 80)
           print("Formatted staged python files with autopep8:")
@@ -270,7 +268,7 @@ def run_autopep8_format(repo_root, staged_files, list_of_changed_staged_files):
           exit(1)
         else:
           run_command_in_folder(
-              "git apply -p1 " + autopep8_format_path, repo_root)
+              "git apply -p0 " + yapf_format_path, repo_root)
           run_command_in_folder("git add " + staged_file, repo_root)
 
   if not first_file_formatted:
@@ -399,8 +397,8 @@ def linter_check(repo_root, linter_subfolder):
       run_clang_format(repo_root, whitelisted_files,
                        list_of_changed_staged_files)
 
-    if linter_config['use_autopep8']:
-      run_autopep8_format(repo_root, whitelisted_files,
+    if linter_config['use_yapf']:
+      run_yapf_format(repo_root, whitelisted_files,
                           list_of_changed_staged_files)
 
 
