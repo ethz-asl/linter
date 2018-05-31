@@ -27,13 +27,6 @@ def get_git_repo_root(some_folder_in_root_repo='./'):
 
 def get_linter_folder(root_repo_folder):
     """Find the folder where this linter is stored."""
-    linter_folder = run_command_in_folder(
-            "git submodule | awk '{ print $2 }'" + " | grep linter",
-            root_repo_folder)
-    if len(linter_folder) != 0:
-        return linter_folder
-
-    # Go via environment variable.
     try:
         return os.environ['LINTER_PATH']
     except KeyError:
