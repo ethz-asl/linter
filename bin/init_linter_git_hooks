@@ -142,7 +142,6 @@ def main():
   arg_parser = argparse.ArgumentParser()
   arg_parser.add_argument(
       '--remove',
-      '-r',
       dest='remove_linter',
       action="store_true",
       help='Remove the linter from this repository.')
