@@ -50,7 +50,7 @@ init_linter_git_hooks --remove
 ```
 
 ## Linter configuration
-To configure the linter, a file named `linterconfig.yaml` in your repository root. An example file is given under [`linterconfig.yaml_example`](https://github.com/ethz-asl/linter/blob/master/linterconfig.yaml_example).
+To configure the linter, add a file named `linterconfig.yaml` in your repository root. An example file is given under [`linterconfig.yaml_example`](https://github.com/ethz-asl/linter/blob/master/linterconfig.yaml_example).
 
 Clang-format can be configured by defining a project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example file:
 
