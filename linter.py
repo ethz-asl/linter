@@ -373,8 +373,8 @@ def linter_check(repo_root, linter_subfolder):
   ascii_art_file = os.path.join(linter_subfolder, "ascii_art.py")
 
   # Read linter config file.
-  linter_config_file = repo_root + '/linterconfig.yaml'
-  if os.path.isfile(repo_root + '/linterconfig.yaml'):
+  linter_config_file = repo_root + '/.linterconfig.yaml'
+  if os.path.isfile(repo_root + '/.linterconfig.yaml'):
       print("Found repo linter config: {}".format(linter_config_file))
       linter_config = read_linter_config(linter_config_file)
   else:
