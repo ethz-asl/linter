@@ -6,12 +6,12 @@ This repo contains a (C++, python (experimental)) linter and auto formatter pack
  * **C++** files:
    * **clang-format** Formats your code based on your .clang-format preferences.
    * **cpplint** Checks your C++ code for style errors and warnings.
-   
+
  * **Python** files:
 
       * **yapf** Formats your python code.
       * **pylint** Checks your Python code for style errors and warnings.
-     
+
 
 ## Dependencies
 
@@ -19,7 +19,7 @@ This repo contains a (C++, python (experimental)) linter and auto formatter pack
    * Ubuntu / macOS: `pip install yapf`
  * **clang-format**
    * Ubuntu: `sudo apt install clang-format-3.8`
-   * macOS: 
+   * macOS:
      ```
      brew install clang-format
      ln -s /usr/local/share/clang/clang-format-diff.py /usr/local/bin/clang-format-diff-3.8
@@ -29,19 +29,30 @@ This repo contains a (C++, python (experimental)) linter and auto formatter pack
 ## Installation
 
 ```bash
-cd $YOUR_REPO
-git submodule add git@github.com:ethz-asl/linter.git
-./linter/init-git-hooks.py
+git clone git@github.com:ethz-asl/linter.git
+cd linter
+echo ". $(realpath setup_linter.sh)" >> ~/.bashrc  # Or the matching file for
+                                                   # your shell.
+source ~/.bashrc
 ```
 
-You can also add the linter submodule in a subfolder of your repo, e.g.:
+Then you can install the linter in your repository:
 ```bash
-mkdir $YOUR_REPO/dev_tools
-git submodule add git@github.com:ethz-asl/linter.git dev_tools/linter
-./dev_tools/linter/init-git-hooks.py
+cd $YOUR_REPO
+init_linter_git_hooks
 ```
 
-Define the project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example:
+## Uninstallation
+To remove the linter from your git repository again, run the following:
+```bash
+cd $YOUR_REPO
+init_linter_git_hooks --remove
+```
+
+## Linter configuration
+To configure the linter, add a file named `.linterconfig.yaml` in your repository root. An example file is given under [`linterconfig.yaml_example`](https://github.com/ethz-asl/linter/blob/master/linterconfig.yaml_example).
+
+Clang-format can be configured by defining a project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example file:
 
 ```
 ---

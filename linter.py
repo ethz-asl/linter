@@ -24,7 +24,7 @@ YAPF_FORMAT_EXECUTABLE = "yapf"
 DEFAULT_CONFIG = {
   'use_clangformat':  True,
   'use_cpplint':      True,
-  # Disable Python checks by default.
+  # Enable Python checks by default.
   'use_yapf':         True,
   'use_pylint':       True,
   # Check all staged files by default.
@@ -123,6 +123,27 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
                                   "catkin package that contains: "
                                   "{}".format(changed_file))
 
+      # Get relative path to repository root.
+      if os.path.isfile(os.path.join(repo_root, '.git')):
+        # Repo is a submodule, look for parent git repository containing this
+        # submodule.
+        search_path = repo_root
+        found_to_level_git_repo = False
+        for _ in range(10):
+          search_path = os.path.dirname(repo_root)
+          if os.path.isdir(os.path.join(search_path, '.git')):
+            found_to_level_git_repo = True
+            break
+
+        assert found_to_level_git_repo
+        repo_root = search_path
+
+      common_prefix = os.path.commonprefix([
+          os.path.abspath(repo_root), os.path.abspath(package_root)])
+      package_root = os.path.relpath(package_root, common_prefix)
+
+      # The package root needs to be relative to the (top-level) repo root.
+      # Otherwise the header guard logic will fail!
       cpplint._root = package_root + '/include'   # pylint: disable=W0212
 
       # Reset error count and messages:
@@ -347,13 +368,13 @@ def get_whitelisted_files(repo_root, files, whitelist):
 def linter_check(repo_root, linter_subfolder):
   """ Main pre-commit function for calling code checking script. """
 
-  cpplint_file = repo_root + "/" + linter_subfolder + "/cpplint.py"
-  pylint_file = repo_root + "/" + linter_subfolder + "/pylint.rc"
-  ascii_art_file = repo_root + "/" + linter_subfolder + "/ascii_art.py"
+  cpplint_file = os.path.join(linter_subfolder, "cpplint.py")
+  pylint_file = os.path.join(linter_subfolder, "pylint.rc")
+  ascii_art_file = os.path.join(linter_subfolder, "ascii_art.py")
 
   # Read linter config file.
-  linter_config_file = repo_root + '/linterconfig.yaml'
-  if os.path.isfile(repo_root + '/linterconfig.yaml'):
+  linter_config_file = repo_root + '/.linterconfig.yaml'
+  if os.path.isfile(repo_root + '/.linterconfig.yaml'):
       print("Found repo linter config: {}".format(linter_config_file))
       linter_config = read_linter_config(linter_config_file)
   else:
