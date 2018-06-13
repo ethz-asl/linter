@@ -31,7 +31,7 @@ extension-pkg-whitelist=numpy
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time.
-disable=no-name-in-module,import-error,fixme,missing-docstring
+disable=no-name-in-module,import-error,fixme,missing-docstring,no-member,wrong-import-position
 
 
 [REPORTS]
