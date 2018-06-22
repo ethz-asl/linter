@@ -34,7 +34,7 @@ default_cpplint = "modified_cpplint.py"
 
 cpplint_url = ""
 
-clang_format_diff_executable = "clang-format-diff-3.8"
+clang_format_diff_executable = "clang-format-diff-6.0"
 
 
 def download_file_from_url(url, file_path):

@@ -18,7 +18,7 @@ import re
 import subprocess
 import yaml
 
-CLANG_FORMAT_DIFF_EXECUTABLE = "clang-format-diff-3.8"
+CLANG_FORMAT_DIFF_EXECUTABLE = "clang-format-diff-6.0"
 YAPF_FORMAT_EXECUTABLE = "yapf"
 
 DEFAULT_CONFIG = {
