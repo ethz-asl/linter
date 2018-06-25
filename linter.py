@@ -18,8 +18,8 @@ import pylint.lint
 import yaml
 
 CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
-    "clang-format-diff-6.0", "clang-format-diff-5.0", "clang-format-diff-4.0",
-    "clang-format-diff-3.9", "clang-format-diff-3.8"
+    "clang-format-diff", "clang-format-diff-6.0", "clang-format-diff-5.0",
+    "clang-format-diff-4.0", "clang-format-diff-3.9", "clang-format-diff-3.8"
 ]
 
 YAPF_FORMAT_EXECUTABLE = "yapf"
