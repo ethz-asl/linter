@@ -1,10 +1,11 @@
 # linter
 
-This repo contains a (C++, python (experimental)) linter and auto formatter package that can be included into your repository as a submodule. It provides the following git hooks:
+This repo contains a (C++, python) linter and auto formatter package that can be conveniently installed into your repositories using git hooks. It provides the following git hooks:
  * **General**
    * Prevent commits to master.
  * **C++** files:
-   * **clang-format** Formats your code based on your .clang-format preferences.
+ *
+   * **clang-format** Formats your code based on your `.clang-format` preferences.
    * **cpplint** Checks your C++ code for style errors and warnings.
 
  * **Python** files:
@@ -18,11 +19,11 @@ This repo contains a (C++, python (experimental)) linter and auto formatter pack
  * **yapf**
    * Ubuntu / macOS: `pip install yapf`
  * **clang-format**
-   * Ubuntu: `sudo apt install clang-format-3.8`
+   * Compatible with `clang-format-3.8 - 6.0`
+   * Ubuntu: `sudo apt install clang-format-${VERSION}`
    * macOS:
      ```
      brew install clang-format
-     ln -s /usr/local/share/clang/clang-format-diff.py /usr/local/bin/clang-format-diff-3.8
      ```
 
 
@@ -50,9 +51,14 @@ init_linter_git_hooks --remove
 ```
 
 ## Linter configuration
+
+**General**
+
 To configure the linter, add a file named `.linterconfig.yaml` in your repository root. An example file is given under [`linterconfig.yaml_example`](https://github.com/ethz-asl/linter/blob/master/linterconfig.yaml_example).
 
-Clang-format can be configured by defining a project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example file:
+**C++**
+
+clang-format can be configured by defining a project-specific C++ format by adding a file `.clang-format` to your projects root folder. Example file:
 
 ```
 ---
@@ -72,6 +78,10 @@ IncludeCategories:
     Priority:        2
 ...
 ```
+
+**Python**
+
+Currently there it is not possible to configure the python formatter on a per-repository basis.
 
 #### ASCII-Art Sources
 
