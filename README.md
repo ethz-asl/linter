@@ -40,7 +40,8 @@ git clone git@github.com:ethz-asl/linter.git
 cd linter
 echo ". $(realpath setup_linter.sh)" >> ~/.bashrc  # Or the matching file for
                                                    # your shell.
-source ~
+bash
+```
 
 Then you can install the linter in your repository:
 ```bash
