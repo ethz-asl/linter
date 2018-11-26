@@ -34,6 +34,13 @@ This repo contains a (C++, python) linter and auto formatter package that can be
 
 
 ## Installation
+> **Note:** Add this to the `~/.bash_profile` to enable the `realpath` command on OSX
+```bash
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+```
+
 
 ```bash
 git clone git@github.com:ethz-asl/linter.git
