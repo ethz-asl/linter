@@ -58,12 +58,11 @@ def read_linter_config(filename):
 
 def run_command_in_folder(command, folder):
     """Run a bash command in a specific folder."""
-    run_command = subprocess.Popen(
-        command,
-        shell=True,
-        cwd=folder,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+    run_command = subprocess.Popen(command,
+                                   shell=True,
+                                   cwd=folder,
+                                   stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE)
     stdout, _ = run_command.communicate()
     command_output = stdout.rstrip()
     return command_output
@@ -232,11 +231,10 @@ def check_if_merge_commit(repo_root):
 
 def find_clang_format_executable():
     for executable in CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS:
-        if subprocess.call(
-                "type " + executable,
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE) == 0:
+        if subprocess.call("type " + executable,
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE) == 0:
             return executable
 
     print("ERROR: clang-format-diff is not installed!")
@@ -246,9 +244,9 @@ def find_clang_format_executable():
 def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
     """Runs clang format on all cpp files staged for commit."""
 
-    clang_format_path = (
-        "/tmp/" + os.path.basename(os.path.normpath(repo_root)) + "_" +
-        datetime.datetime.now().isoformat() + ".clang.patch")
+    clang_format_path = ("/tmp/" +
+                         os.path.basename(os.path.normpath(repo_root)) + "_" +
+                         datetime.datetime.now().isoformat() + ".clang.patch")
 
     clang_format_diff_executable = find_clang_format_executable()
 
@@ -286,11 +284,12 @@ def run_yapf_format(repo_root, staged_files, list_of_changed_staged_files):
 
             # Check if the file needs formatting by applying the formatting and
             # store the results into a patch file.
-            yapf_format_path = (
-                "/tmp/" + os.path.basename(os.path.normpath(repo_root)) + "_" +
-                datetime.datetime.now().isoformat() + ".yapf.patch")
-            task = (YAPF_FORMAT_EXECUTABLE + " --style pep8 -d " + staged_file
-                    + " > " + yapf_format_path)
+            yapf_format_path = ("/tmp/" +
+                                os.path.basename(os.path.normpath(repo_root)) +
+                                "_" + datetime.datetime.now().isoformat() +
+                                ".yapf.patch")
+            task = (YAPF_FORMAT_EXECUTABLE + " --style pep8 -d " +
+                    staged_file + " > " + yapf_format_path)
             run_command_in_folder(task, repo_root)
 
             if not os.stat(yapf_format_path).st_size == 0:
@@ -351,8 +350,9 @@ def check_python_lint(repo_root, staged_files, pylint_file):
                 repo_root + "/" + changed_file
             ]
             from pylint.reporters.text import TextReporter
-            pylint.lint.Run(
-                pylint_args, reporter=TextReporter(pylint_output), exit=False)
+            pylint.lint.Run(pylint_args,
+                            reporter=TextReporter(pylint_output),
+                            exit=False)
 
             for output_line in pylint_output.read():
                 if re.search(r'^(E|C|W):', output_line):
@@ -464,9 +464,12 @@ def linter_check(repo_root, linter_subfolder):
 
         if not (cpp_lint_success and pylint_success):
             print("=" * 80)
-            print("Commit rejected! Please address the linter errors above.")
+            print(
+                "Commit not up to standards! Please address the linter errors above."
+            )
+            print("All of these linter errors must be resolved before merge.")
             print("=" * 80)
-            exit(1)
+
         else:
 
             commit_number = get_number_of_commits(repo_root)
