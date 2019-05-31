@@ -4,7 +4,7 @@
 
 class AsciiArt(object):
 
-  tiger = r"""
+    tiger = r"""
                                                      _
                                                    ,',\
                                                   ( / \\
@@ -37,7 +37,7 @@ class AsciiArt(object):
 
   """
 
-  cthulhu = r"""
+    cthulhu = r"""
 
 
                                     _.---._
@@ -75,7 +75,7 @@ class AsciiArt(object):
 
   """
 
-  story = r"""
+    story = r"""
               ______        _         ______        _
               \___  \____  | |        \__   \____  | |
                | | _/\__ \ | |__       | | _/\__ \ | |__
@@ -134,7 +134,7 @@ class AsciiArt(object):
 
   """
 
-  commit_success = r"""
+    commit_success = r"""
 
             d888888b                         d888888b
          d888    8888b                    d888888   888b
@@ -155,7 +155,7 @@ class AsciiArt(object):
          
   """
 
-  grumpy_cat = r"""
+    grumpy_cat = r"""
 
                                                    : sdMMm+
                                                 /mMMMMMMM+
@@ -203,7 +203,7 @@ class AsciiArt(object):
 
   """
 
-  homer_woohoo = r"""
+    homer_woohoo = r"""
 
                                     ,#M]RRD`"RW
                                    ,R,qB*""``"*Rw,
@@ -237,5 +237,28 @@ class AsciiArt(object):
                        /R
 
                     Woohoo, no formatter or linter for merge commits!
+
+  """
+
+    devil = r"""
+                                ,-.
+          ___,---.__          /'|`\          __,---,___
+        ,-'    \`    `-.____,-'  |  `-.____,-'    //    `-.
+      ,'        |           ~'\     /`~           |        `.
+    /      ___//              `. ,'          ,  , \___      \
+    |    ,-'   `-.__   _         |        ,    __,-'   `-.    |
+    |   /          /\_  `   .    |    ,      _/\          \   |
+    \  |           \ \`-.___ \   |   / ___,-'/ /           |  /
+    \  \           | `._   `\\  |  //'   _,' |           /  /
+      `-.\         /'  _ `---'' , . ``---' _  `\         /,-'
+        ``       /     \    ,='/ \`=.    /     \       ''
+                |__   /|\_,--.,-.--,--._/|\   __|
+                /  `./  \\`\ |  |  | /,//' \,'  \
+    eViL        /   /     ||--+--|--+-/-|     \   \
+              |   |     /'\_\_\ | /_/_/`\     |   |
+                \   \__, \_     `~'     _/ .__/   /
+                `-._,-'   `-._______,-'   `-._,-'
+                
+                'However, you have chosen to commit anyway.'
 
   """

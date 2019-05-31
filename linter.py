@@ -477,7 +477,7 @@ def linter_check(repo_root, linter_subfolder):
                 exit(1)
 
             else:
-                print('However, you have chosen to commit anyway.')
+                print(ascii_art.AsciiArt.devil)
         else:
 
             commit_number = get_number_of_commits(repo_root)
