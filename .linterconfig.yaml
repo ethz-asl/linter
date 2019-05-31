@@ -1,0 +1,7 @@
+# Turn the components of the linter individualy on / off.
+clangformat: on
+cpplint: on
+yapf: on
+pylint: on
+block-commits: off
+

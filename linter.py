@@ -30,6 +30,8 @@ DEFAULT_CONFIG = {
     # Enable Python checks by default.
     'use_yapf': True,
     'use_pylint': True,
+    # Block commits that don't pass by default
+    'block-commits': True,
     # Check all staged files by default.
     'whitelist': []
 }
@@ -50,6 +52,8 @@ def read_linter_config(filename):
         config['use_yapf'] = parsed_config['yapf']
     if 'pylint' in parsed_config.keys():
         config['use_pylint'] = parsed_config['pylint']
+    if 'block-commits' in parsed_config.keys():
+        config['block-commits'] = parsed_config['block-commits']
     if 'whitelist' in parsed_config.keys():
         config['whitelist'] = parsed_config['whitelist']
 
@@ -469,7 +473,11 @@ def linter_check(repo_root, linter_subfolder):
             )
             print("All of these linter errors must be resolved before merge.")
             print("=" * 80)
+            if linter_config['block-commits']:
+                exit(1)
 
+            else:
+                print('However, you have chosen to commit anyway.')
         else:
 
             commit_number = get_number_of_commits(repo_root)
