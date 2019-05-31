@@ -45,7 +45,9 @@ def get_user_confirmation(default=False):
     while (True):
         resp = raw_input()
         try:
-            if distutils.util.strtobool(resp):
+            if resp == '':
+                return default
+            elif distutils.util.strtobool(resp):
                 return True
             else:
                 return False
