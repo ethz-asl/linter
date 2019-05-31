@@ -13,6 +13,8 @@ import imp
 import os
 import re
 import subprocess
+import distutils
+import sys
 
 import pylint.lint
 import yaml
@@ -35,6 +37,21 @@ DEFAULT_CONFIG = {
     # Check all staged files by default.
     'whitelist': []
 }
+
+
+def get_user_confirmation(default=False):
+    """Requests confirmation string from user"""
+    sys.stdin = open('/dev/tty')
+    while (True):
+        resp = raw_input()
+        try:
+            if distutils.util.strtobool(resp):
+                return True
+            else:
+                return False
+        except ValueError:
+            print('{} is not a valid response.'.format(resp))
+            print('Please answer with y(es) or n(o)')
 
 
 def read_linter_config(filename):
@@ -470,14 +487,23 @@ def linter_check(repo_root, linter_subfolder):
             print("=" * 80)
             print("Commit not up to standards!")
             print("Please address the linter errors above.")
-            print("All of these linter errors must be resolved before merge.")
             print("=" * 80)
             if linter_config['block-commits']:
                 exit(1)
 
             else:
-                print("However, you've chosen to commit anyway.")
-                print(ascii_art.AsciiArt.yoda)
+                print("However, you may commit anyway, if you must.")
+                print(
+                    "All of these linter errors must be resolved before merge."
+                )
+                print("Would you like to commit anyway? yN")
+
+                if get_user_confirmation():
+                    print(ascii_art.AsciiArt.yoda)
+
+                else:
+                    exit(1)
+
         else:
 
             commit_number = get_number_of_commits(repo_root)
