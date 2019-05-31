@@ -241,7 +241,7 @@ class AsciiArt(object):
   """
 
     yoda = r"""
-                        ____
+    ____
                     _.' :  `._
                 .-.'`.  ;   .'`.-.
         __      / : ___\ ;  /___ ; \      __
@@ -252,7 +252,7 @@ class AsciiArt(object):
                 L ' /.------.\ ' J
                   "-.   "--"   .-"
                 __.l"-:_JL_;-";.__
-              .-j/'.;  ;""""  / .'\"-.
+              .-j/'.;  ;  / .'\-.
             .' /:`. "-.:     .-" .';  `.
         .-"  / ;  "-. "-..-" .-"  :    "-.
       .+"-.  : :      "-.__.-"      ;-._   \
@@ -271,5 +271,6 @@ class AsciiArt(object):
                     \ `t  ._  /  bug :F_P:
                     "-.t-._:'
         Careful be, you must. Unformatted code
-                to the dark side leads.
+                to the dark side leads
+
     """

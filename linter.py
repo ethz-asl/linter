@@ -468,9 +468,8 @@ def linter_check(repo_root, linter_subfolder):
 
         if not (cpp_lint_success and pylint_success):
             print("=" * 80)
-            print(
-                "Commit not up to standards! Please address the linter errors above."
-            )
+            print("Commit not up to standards!")
+            print("Please address the linter errors above.")
             print("All of these linter errors must be resolved before merge.")
             print("=" * 80)
             if linter_config['block-commits']:
