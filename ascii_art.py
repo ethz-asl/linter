@@ -4,7 +4,7 @@
 
 class AsciiArt(object):
 
-  tiger = r"""
+    tiger = r"""
                                                      _
                                                    ,',\
                                                   ( / \\
@@ -37,7 +37,7 @@ class AsciiArt(object):
 
   """
 
-  cthulhu = r"""
+    cthulhu = r"""
 
 
                                     _.---._
@@ -75,7 +75,7 @@ class AsciiArt(object):
 
   """
 
-  story = r"""
+    story = r"""
               ______        _         ______        _
               \___  \____  | |        \__   \____  | |
                | | _/\__ \ | |__       | | _/\__ \ | |__
@@ -134,7 +134,7 @@ class AsciiArt(object):
 
   """
 
-  commit_success = r"""
+    commit_success = r"""
 
             d888888b                         d888888b
          d888    8888b                    d888888   888b
@@ -155,7 +155,7 @@ class AsciiArt(object):
          
   """
 
-  grumpy_cat = r"""
+    grumpy_cat = r"""
 
                                                    : sdMMm+
                                                 /mMMMMMMM+
@@ -203,7 +203,7 @@ class AsciiArt(object):
 
   """
 
-  homer_woohoo = r"""
+    homer_woohoo = r"""
 
                                     ,#M]RRD`"RW
                                    ,R,qB*""``"*Rw,
@@ -239,3 +239,38 @@ class AsciiArt(object):
                     Woohoo, no formatter or linter for merge commits!
 
   """
+
+    yoda = r"""
+    ____
+                    _.' :  `._
+                .-.'`.  ;   .'`.-.
+        __      / : ___\ ;  /___ ; \      __
+      ,'_ ""--.:__;".-.";: :".-.":__;.--"" _`,
+      :' `.t""--.. '<@.`;_  ',@>` ..--""j.' `;
+          `:-.._J '-.-'L__ `-- ' L_..-;'
+            "-.__ ;  .-"  "-.  : __.-"
+                L ' /.------.\ ' J
+                  "-.   "--"   .-"
+                __.l"-:_JL_;-";.__
+              .-j/'.;  ;  / .'\-.
+            .' /:`. "-.:     .-" .';  `.
+        .-"  / ;  "-. "-..-" .-"  :    "-.
+      .+"-.  : :      "-.__.-"      ;-._   \
+      ; \  `.; ;                    : : "+. ;
+      :  ;   ; ;                    : ;  : \:
+    : `."-; ;  ;                  :  ;   ,/;
+      ;    -: ;  :                ;  : .-"'  :
+      :\     \  : ;             : \.-"      :
+      ;`.    \  ; :            ;.'_..--  / ;
+      :  "-.  "-:  ;          :/."      .'  :
+        \       .-`.\        /t-""  ":-+.   :
+          `.  .-"    `l    __/ /`. :  ; ; \  ;
+            \   .-" .-"-.-"  .' .'j \  /   ;/
+            \ / .-"   /.     .'.' ;_:'    ;
+              :-""-.`./-.'     /    `.___.'
+                    \ `t  ._  /  bug :F_P:
+                    "-.t-._:'
+        Careful be, you must. Unformatted code
+                to the dark side leads
+
+    """
