@@ -126,4 +126,5 @@ Currently there it is not possible to configure the python formatter on a per-re
 
 ## ASCII-Art Sources
 
+ * [www.asciiart.eu](https://www.asciiart.eu)
  * [www.retrojunkie.com (accessed through web.archive.org)](https://web.archive.org/web/20150831003349/http://www.retrojunkie.com:80/asciiart/)
