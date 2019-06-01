@@ -16,7 +16,7 @@ persistent=yes
 
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
-load-plugins=pylint.extensions.docparams
+load-plugins=
 
 extension-pkg-whitelist=numpy
 
@@ -31,7 +31,7 @@ extension-pkg-whitelist=numpy
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifier separated by comma (,) or put this option
 # multiple time.
-disable=no-name-in-module,import-error,fixme,no-member,wrong-import-position,bad-continuation
+disable=no-name-in-module,import-error,fixme,missing-docstring,no-member,wrong-import-position,bad-continuation
 
 
 [REPORTS]
