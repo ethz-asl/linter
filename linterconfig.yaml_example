@@ -3,7 +3,15 @@ clangformat: on
 cpplint: on
 yapf: on
 pylint: on
-block-commits: on
+
+# If set to global, the linter uses the pylint.rc from the "default" folder. If
+# set to local, the linter uses .pylintrc from the repository root.
+pylint_config: global
+
+# If on, the linter blocks commits after detecting an error. Otherwise, the
+# user is asked whether to proceed
+# with the commit.
+block_commits: on
 
 # If this whitelist block is present, the linter only operates on the files and
 # directories listed in this whitelist.
