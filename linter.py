@@ -32,8 +32,6 @@ DEFAULT_CONFIG = {
     'use_cpplint': True,
     'use_yapf': True,
     'use_pylint': True,
-    # Use the config files of the linter by default.
-    'pylint_config': 'global',
     # Block commits that don't pass by default
     'block_commits': True,
     # Check all staged files by default.
@@ -73,8 +71,6 @@ def read_linter_config(filename):
         config['use_yapf'] = parsed_config['yapf']
     if 'pylint' in parsed_config.keys():
         config['use_pylint'] = parsed_config['pylint']
-    if 'pylint_config' in parsed_config.keys():
-        config['pylint_config'] = parsed_config['pylint_config']
     if 'block_commits' in parsed_config.keys():
         config['block_commits'] = parsed_config['block_commits']
     if 'whitelist' in parsed_config.keys():
@@ -430,17 +426,10 @@ def linter_check(repo_root, linter_subfolder):
     cpplint_file = os.path.join(linter_subfolder, "cpplint.py")
     ascii_art_file = os.path.join(linter_subfolder, "ascii_art.py")
 
-    if linter_config['pylint_config'] == "global":
-        pylintrc_file = os.path.join(linter_subfolder, "pylint.rc")
-    elif linter_config['pylint_config'] == "local":
-        if not os.path.isfile(os.path.join(repo_root, ".pylintrc")):
-            print("A .pylintrc file is required in the repository root")
-            exit(1)
+    if os.path.isfile(os.path.join(repo_root, ".pylintrc")):
         pylintrc_file = os.path.join(repo_root, ".pylintrc")
     else:
-        print("{} is not a valid setting for pylint_config".format(
-            linter_config['pylint_config']))
-        exit(1)
+        pylintrc_file = os.path.join(linter_subfolder, "pylint.rc")
 
 
     print("Found linter subfolder: {}".format(linter_subfolder))
