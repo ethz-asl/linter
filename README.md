@@ -87,7 +87,8 @@ IncludeCategories:
 
 **Python**
 
-Currently there it is not possible to configure the python formatter on a per-repository basis.
+Currently there it is not possible to configure the python formatter on a per-repository basis. The linter can be configured on a per-repository bais by adding a `.pylintrc` file to your repositorie's root folder.
+
 
 
 ## Disable Linter Functionalities for a Specific Line

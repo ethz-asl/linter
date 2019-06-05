@@ -27,13 +27,13 @@ CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
 YAPF_FORMAT_EXECUTABLE = "yapf"
 
 DEFAULT_CONFIG = {
+    # Enable code checks and formatting by default.
     'use_clangformat': True,
     'use_cpplint': True,
-    # Enable Python checks by default.
     'use_yapf': True,
     'use_pylint': True,
     # Block commits that don't pass by default
-    'block-commits': True,
+    'block_commits': True,
     # Check all staged files by default.
     'whitelist': []
 }
@@ -71,8 +71,8 @@ def read_linter_config(filename):
         config['use_yapf'] = parsed_config['yapf']
     if 'pylint' in parsed_config.keys():
         config['use_pylint'] = parsed_config['pylint']
-    if 'block-commits' in parsed_config.keys():
-        config['block-commits'] = parsed_config['block-commits']
+    if 'block_commits' in parsed_config.keys():
+        config['block_commits'] = parsed_config['block_commits']
     if 'whitelist' in parsed_config.keys():
         config['whitelist'] = parsed_config['whitelist']
 
@@ -414,10 +414,6 @@ def get_whitelisted_files(repo_root, files, whitelist):
 def linter_check(repo_root, linter_subfolder):
     """ Main pre-commit function for calling code checking script. """
 
-    cpplint_file = os.path.join(linter_subfolder, "cpplint.py")
-    pylint_file = os.path.join(linter_subfolder, "pylint.rc")
-    ascii_art_file = os.path.join(linter_subfolder, "ascii_art.py")
-
     # Read linter config file.
     linter_config_file = repo_root + '/.linterconfig.yaml'
     if os.path.isfile(repo_root + '/.linterconfig.yaml'):
@@ -426,10 +422,20 @@ def linter_check(repo_root, linter_subfolder):
     else:
         linter_config = DEFAULT_CONFIG
 
+
+    cpplint_file = os.path.join(linter_subfolder, "cpplint.py")
+    ascii_art_file = os.path.join(linter_subfolder, "ascii_art.py")
+
+    if os.path.isfile(os.path.join(repo_root, ".pylintrc")):
+        pylintrc_file = os.path.join(repo_root, ".pylintrc")
+    else:
+        pylintrc_file = os.path.join(linter_subfolder, "pylint.rc")
+
+
     print("Found linter subfolder: {}".format(linter_subfolder))
     print("Found ascii art file at: {}".format(ascii_art_file))
     print("Found cpplint file at: {}".format(cpplint_file))
-    print("Found pylint file at: {}".format(pylint_file))
+    print("Found pylint config file at: {}".format(pylintrc_file))
 
     # Run checks
     staged_files = get_staged_files()
@@ -481,7 +487,7 @@ def linter_check(repo_root, linter_subfolder):
         # style guide.
         if linter_config['use_pylint']:
             pylint_success = check_python_lint(repo_root, whitelisted_files,
-                                               pylint_file)
+                                               pylintrc_file)
         else:
             pylint_success = True
 
@@ -490,7 +496,7 @@ def linter_check(repo_root, linter_subfolder):
             print("Commit not up to standards!")
             print("Please address the linter errors above.")
             print("=" * 80)
-            if linter_config['block-commits']:
+            if linter_config['block_commits']:
                 exit(1)
 
             else:
