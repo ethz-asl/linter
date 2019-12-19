@@ -150,7 +150,7 @@ class AsciiArt(object):
                88          _(<_   / )_          88
               d88b        (__\_\_|_/__)        d88b
 
-        Your happiness shall not depend on what you have or what your are,
+        Your happiness shall not depend on what you have or what you are,
          it shall solely depend on the beauty of your code.
          
   """
