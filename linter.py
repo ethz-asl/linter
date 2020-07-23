@@ -440,7 +440,7 @@ def check_python_lint(repo_root, staged_files, pylint_file):
         print("=" * 80)
         print("Found {} pylint errors".format(len(pylint_errors)))
         print("=" * 80)
-        return False, pylint_errors
+        return False, len(pylint_errors)
     else:
         return True, 0
 
