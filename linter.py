@@ -644,10 +644,10 @@ def linter_check_all(repo_root, linter_subfolder):
     else:
         pylint_success = True
 
-    n_python = len([f for f in files if f.lower().endswith('.py')])
-    checked_files_msg = "Found %i errors in %i C++ files and %i erros in %i " \
-                        "Python files." % (cpp_errors, len(files) - n_python,
-                                           py_errors, n_python)
+    n_py = len([f for f in files if f.lower().endswith('.py')])
+    checked_files_msg = "Found %i errors checking %i C++ files and " \
+                        "%i erros checking %i Python files." \
+                        % (cpp_errors, len(files) - n_py, py_errors, n_py)
 
     if not (cpp_lint_success and pylint_success):
         print("=" * 80)
