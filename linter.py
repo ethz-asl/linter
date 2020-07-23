@@ -38,7 +38,7 @@ DEFAULT_CONFIG = {
     'use_yapf': True,
     'use_pylint': True,
     # Block commits that don't pass by default
-    'block_commits': True,
+    'block_commits': False,
     # Check all staged files by default.
     'whitelist': []
 }
@@ -570,12 +570,26 @@ def linter_check(repo_root, linter_subfolder):
             commit_number = get_number_of_commits(repo_root)
             lucky_commit = ((int(commit_number) + 1) % 42 == 0)
 
+            # Pretty printing for the commit number
+            commit_number_text = str(commit_number)
+            if commit_number_text[-1:] == "1" \
+                    and commit_number_text[-2:] != "11":
+                commit_number_text = commit_number_text + "st"
+            elif commit_number_text[-1:] == "2" \
+                    and commit_number_text[-2:] != "12":
+                commit_number_text = commit_number_text + "nd"
+            elif commit_number_text[-1:] == "3" \
+                    and commit_number_text[-2:] != "13":
+                commit_number_text = commit_number_text + "rd"
+            else:
+                commit_number_text = commit_number_text + "th"
+
             if lucky_commit:
                 print(ascii_art.AsciiArt.story)
 
                 print("=" * 80)
-                print("Commit accepted, well done! This is your {}th commit!".
-                      format(commit_number))
+                print("Commit accepted, well done! This is your %s commit!" %
+                      commit_number_text)
                 print("This is a lucky commit! " +
                       "Please enjoy this free sheep story.")
                 print("=" * 80)
@@ -583,8 +597,8 @@ def linter_check(repo_root, linter_subfolder):
                 print(ascii_art.AsciiArt.commit_success)
 
                 print("=" * 80)
-                print("Commit accepted, well done! This is the {}th commit!".
-                      format(commit_number))
+                print("Commit accepted, well done! This is your %s commit!" %
+                      commit_number_text)
                 print("=" * 80)
     else:
         print(ascii_art.AsciiArt.homer_woohoo)
