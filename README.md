@@ -123,6 +123,11 @@ Currently there it is not possible to configure the python formatter on a per-re
    ...
    # yapf: enable
    ```
+   
+## Tools
+* **Cheking an entire repository** 
+
+  Type `linter_check_all` to get run the linter on all files within the current repository.
 
 
 ## ASCII-Art Sources
