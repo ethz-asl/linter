@@ -38,7 +38,7 @@ DEFAULT_CONFIG = {
     'use_yapf': True,
     'use_pylint': True,
     # Block commits that don't pass by default
-    'block_commits': False,
+    'block_commits': True,
     # Check all staged files by default.
     'whitelist': [],
     # Prevents pylint from printing the config XX times.

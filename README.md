@@ -127,7 +127,7 @@ Currently there it is not possible to configure the python formatter on a per-re
 ## Tools
 * **Cheking an entire repository** 
 
-  Type `linter_check_all` to get run the linter on all files within the current repository.
+  Type `linter_check_all` to run the linters and formatters on all files within the current repository.
 
 
 ## ASCII-Art Sources
