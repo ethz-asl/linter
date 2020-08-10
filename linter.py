@@ -16,6 +16,7 @@ import subprocess
 import distutils
 import sys
 
+from cStringIO import StringIO
 import pylint.lint
 import yaml
 
@@ -42,7 +43,7 @@ DEFAULT_CONFIG = {
     # Check all staged files by default.
     'whitelist': [],
     # Prevents pylint from printing the config XX times.
-    'allow_pylint_stderr': False
+    'filter_pylint_stderr': True
 }
 
 # Files containing these in name or path will not be checked by get_all_files()
@@ -455,7 +456,10 @@ def run_yapf_format_on_all(repo_root, files):
     return formatted_counter
 
 
-def check_python_lint(repo_root, staged_files, pylint_file, allow_stderr=True):
+def check_python_lint(repo_root,
+                      staged_files,
+                      pylint_file,
+                      filter_pylint_stderr=False):
     """Runs pylint on all python scripts staged for commit.
     Return success and number of errors."""
     class TextReporterBuffer(object):
@@ -472,9 +476,10 @@ def check_python_lint(repo_root, staged_files, pylint_file, allow_stderr=True):
             """read"""
             return self.content
 
-    print("Running pylint...")
+    if filter_pylint_stderr:
+        print("Running pylint...")
 
-    # Parse each pylint output line individualy and searches
+    # Parse each pylint output line individually and searches
     # for errors in the code.
     pylint_errors = []
     for changed_file in staged_files:
@@ -484,7 +489,6 @@ def check_python_lint(repo_root, staged_files, pylint_file, allow_stderr=True):
             name_to_print = changed_file
             if name_to_print[:len(repo_root)] == repo_root:
                 name_to_print = changed_file[len(repo_root) + 1:]
-
             pylint_output = TextReporterBuffer()
             pylint_args = [
                 "--rcfile=" + pylint_file, "-rn",
@@ -493,14 +497,24 @@ def check_python_lint(repo_root, staged_files, pylint_file, allow_stderr=True):
 
             # Prevent pylint from printing the config XX times
             prev_stderr = sys.stderr
-            if not allow_stderr:
-                sys.stderr = open(os.devnull, "w")
+            if filter_pylint_stderr:
+                stderr_buffer = StringIO()
+                sys.stderr = stderr_buffer
 
+            # Run the linter
             from pylint.reporters.text import TextReporter
             pylint.lint.Run(pylint_args,
                             reporter=TextReporter(pylint_output),
                             exit=False)
+
+            # Reset stderr and print filtered warnings.
             sys.stderr = prev_stderr
+            if filter_pylint_stderr:
+                warnings = stderr_buffer.getvalue().splitlines()
+                for warning in warnings:
+                    if warning[:18] != 'Using config file ':
+                        sys.stderr.write(warning)
+                        sys.stderr.flush()
 
             errors = []
             for output_line in pylint_output.read():
@@ -617,14 +631,15 @@ def linter_check(repo_root, linter_subfolder):
         else:
             cpp_lint_success = True
 
-        # Use pylint to check for comimpliance with Tensofrflow python
+        # Use pylint to check for compliance with Tensorflow python
         # style guide.
         if linter_config['use_pylint']:
-            allow_stderr = True
-            if 'allow_pylint_stderr' in linter_config:
-                allow_stderr = linter_config['allow_pylint_stderr']
+            filter_pylint_stderr = False
+            if 'filter_pylint_stderr' in linter_config:
+                filter_pylint_stderr = linter_config['filter_pylint_stderr']
             pylint_success, _ = check_python_lint(repo_root, whitelisted_files,
-                                                  pylintrc_file, allow_stderr)
+                                                  pylintrc_file,
+                                                  filter_pylint_stderr)
         else:
             pylint_success = True
 
@@ -648,9 +663,7 @@ def linter_check(repo_root, linter_subfolder):
 
                 else:
                     exit(1)
-
         else:
-
             commit_number = get_number_of_commits(repo_root)
             lucky_commit = ((int(commit_number) + 1) % 42 == 0)
 
@@ -747,13 +760,14 @@ def linter_check_all(repo_root, linter_subfolder):
     # Use pylint to check for comimpliance with Tensofrflow python
     # style guide.
     py_errors = 0
+    print("Files:", files)
     if linter_config['use_pylint']:
-        allow_stderr = True
-        if 'allow_pylint_stderr' in linter_config:
-            allow_stderr = linter_config['allow_pylint_stderr']
+        filter_pylint_stderr = False
+        if 'filter_pylint_stderr' in linter_config:
+            filter_pylint_stderr = linter_config['filter_pylint_stderr']
         pylint_success, py_errors = check_python_lint(repo_root, files,
                                                       pylintrc_file,
-                                                      allow_stderr)
+                                                      filter_pylint_stderr)
         if py_errors == 0:
             print("=" * 80)
             print("Found 0 pylint errors.")
