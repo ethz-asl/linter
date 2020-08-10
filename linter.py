@@ -665,7 +665,7 @@ def linter_check(repo_root, linter_subfolder):
                     exit(1)
         else:
             commit_number = get_number_of_commits(repo_root)
-            lucky_commit = ((int(commit_number) + 1) % 42 == 0)
+            lucky_commit = (int(commit_number) % 42 == 0)
 
             # Pretty printing for the commit number
             commit_number_text = str(commit_number)
