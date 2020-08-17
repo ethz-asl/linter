@@ -16,12 +16,18 @@ import subprocess
 import distutils
 import sys
 
+from cStringIO import StringIO
 import pylint.lint
 import yaml
 
 CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
     "clang-format-diff", "clang-format-diff-6.0", "clang-format-diff-5.0",
     "clang-format-diff-4.0", "clang-format-diff-3.9", "clang-format-diff-3.8"
+]
+
+CLANG_FORMAT_EXECUTABLE_VERSIONS = [
+    "clang-format", "clang-format-6.0", "clang-format-5.0", "clang-format-4.0",
+    "clang-format-3.9", "clang-format-3.8"
 ]
 
 YAPF_FORMAT_EXECUTABLE = "yapf"
@@ -35,14 +41,21 @@ DEFAULT_CONFIG = {
     # Block commits that don't pass by default
     'block_commits': True,
     # Check all staged files by default.
-    'whitelist': []
+    'whitelist': [],
+    # Prevents pylint from printing the config XX times.
+    'filter_pylint_stderr': True
 }
+
+# Files containing these in name or path will not be checked by get_all_files()
+ALL_FILES_BLACKLISTED_NAMES = ['cmake-build-debug', '3rd_party', 'third_party']
+
+CPP_SUFFIXES = ['.cpp', '.cc', '.cu', '.cuh', '.h', '.hpp', '.hxx']
 
 
 def get_user_confirmation(default=False):
     """Requests confirmation string from user"""
     sys.stdin = open('/dev/tty')
-    while (True):
+    while True:
         resp = raw_input()
         try:
             if resp == '':
@@ -119,8 +132,24 @@ def get_unstaged_files(some_folder_in_root_repo='./'):
     return output.split("\n")
 
 
+def get_all_files(repo_root):
+    """Get all files from in this repo."""
+    output = []
+
+    for root, _, files in os.walk(repo_root):
+        for f in files:
+            if f.lower().endswith(tuple(CPP_SUFFIXES + ['.py'])):
+                full_name = os.path.join(root, f)[len(repo_root) + 1:]
+                if not any(n in full_name
+                           for n in ALL_FILES_BLACKLISTED_NAMES):
+                    output.append(full_name)
+
+    return output
+
+
 def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
-    """Runs Google's cpplint on all C++ files staged for commit,"""
+    """Runs Google's cpplint on all C++ files staged for commit,
+    return success and number of errors"""
     cpplint = imp.load_source('cpplint', cpplint_file)
     cpplint._cpplint_state.SetFilters('-legal/copyright,-build/c++11')  # pylint: disable=W0212
 
@@ -132,7 +161,7 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
     for changed_file in staged_files:
         if not os.path.isfile(changed_file):
             continue
-        if changed_file.lower().endswith(('.cc', '.h', '.cpp', '.cu', '.cuh')):
+        if changed_file.lower().endswith(tuple(CPP_SUFFIXES)):
             # Search iteratively for the root of the catkin package.
             package_root = ''
             search_dir = os.path.dirname(os.path.abspath(changed_file))
@@ -187,8 +216,12 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
                 total_error_count += error_count
 
                 print("-" * 80)
+                name_to_print = changed_file
+                if name_to_print[:len(repo_root)] == repo_root:
+                    name_to_print = changed_file[len(repo_root) + 1:]
+
                 print("Found {} errors in : {}".format(error_count,
-                                                       changed_file))
+                                                       name_to_print))
                 print("-" * 80)
                 for line in cpplint.output:
                     assert len(line) == 2
@@ -203,9 +236,9 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
             print(ascii_art.AsciiArt.cthulhu)
         elif total_error_count > 20:
             print(ascii_art.AsciiArt.tiger)
-        return False
+        return False, total_error_count
     else:
-        return True
+        return True, 0
 
 
 def check_modified_after_staging(staged_files):
@@ -252,7 +285,7 @@ def check_if_merge_commit(repo_root):
     return os.path.isfile(merge_msg_file_path)
 
 
-def find_clang_format_executable():
+def find_clang_format_diff_executable():
     for executable in CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS:
         if subprocess.call("type " + executable,
                            shell=True,
@@ -264,6 +297,18 @@ def find_clang_format_executable():
     exit(1)
 
 
+def find_clang_format_executable():
+    for executable in CLANG_FORMAT_EXECUTABLE_VERSIONS:
+        if subprocess.call("type " + executable,
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE) == 0:
+            return executable
+
+    print("ERROR: clang-format is not installed!")
+    exit(1)
+
+
 def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
     """Runs clang format on all cpp files staged for commit."""
 
@@ -271,7 +316,7 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
                          os.path.basename(os.path.normpath(repo_root)) + "_" +
                          datetime.datetime.now().isoformat() + ".clang.patch")
 
-    clang_format_diff_executable = find_clang_format_executable()
+    clang_format_diff_executable = find_clang_format_diff_executable()
 
     run_command_in_folder(
         "git diff -U0 --cached | " + clang_format_diff_executable +
@@ -296,6 +341,39 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
     return True
 
 
+def run_clang_format_on_all(repo_root, files):
+    """Runs clang format on all cpp files in repo."""
+
+    clang_format_executable = find_clang_format_executable()
+    counter = 0
+    formatted_counter = 0
+    for f in files:
+        f_long = os.path.join(repo_root, f)
+        if not os.path.isfile(f_long):
+            continue
+        if f.lower().endswith(tuple(CPP_SUFFIXES)):
+            counter = counter + 1
+            stat = os.stat(f_long)
+            run_command_in_folder(clang_format_executable + " -i " + f,
+                                  repo_root)
+            if os.stat(f_long) != stat:
+                if formatted_counter == 0:
+                    print("=" * 80)
+                    print("Formatted C++ files with clang-format:")
+
+                print("-> " + f)
+                formatted_counter = formatted_counter + 1
+
+    if formatted_counter > 0:
+        print("Formatted %i of %i checked C++ files in this repo." %
+              (formatted_counter, counter))
+    else:
+        print("=" * 80)
+        print("All %i checked C++ files in this repo are in agreement with "
+              "clang-format." % counter)
+    return formatted_counter
+
+
 def run_yapf_format(repo_root, staged_files, list_of_changed_staged_files):
     """Runs yapf format on all python files staged for commit."""
 
@@ -304,7 +382,6 @@ def run_yapf_format(repo_root, staged_files, list_of_changed_staged_files):
         if not os.path.isfile(staged_file):
             continue
         if staged_file.endswith((".py")):
-
             # Check if the file needs formatting by applying the formatting and
             # store the results into a patch file.
             yapf_format_path = ("/tmp/" +
@@ -339,12 +416,54 @@ def run_yapf_format(repo_root, staged_files, list_of_changed_staged_files):
     return True
 
 
-def check_python_lint(repo_root, staged_files, pylint_file):
-    """Runs pylint on all python scripts staged for commit."""
+def run_yapf_format_on_all(repo_root, files):
+    """Runs yapf format on all python files."""
 
+    # Check if the file needs formatting by applying the formatting and
+    # store the results into a patch file.
+    yapf_format_path = ("/tmp/" +
+                        os.path.basename(os.path.normpath(repo_root)) + "_" +
+                        datetime.datetime.now().isoformat() + ".yapf.patch")
+
+    counter = 0
+    formatted_counter = 0
+    for f in files:
+        if not os.path.isfile(os.path.join(repo_root, f)):
+            continue
+        if f.endswith((".py")):
+            counter = counter + 1
+            task = (YAPF_FORMAT_EXECUTABLE + " --style pep8 -d " + f + " > " +
+                    yapf_format_path)
+            run_command_in_folder(task, repo_root)
+
+            if not os.stat(yapf_format_path).st_size == 0:
+                if formatted_counter == 0:
+                    print("=" * 80)
+                    print("Formatted python files with autopep8:")
+
+                print("-> " + f)
+                run_command_in_folder("git apply -p0 " + yapf_format_path,
+                                      repo_root)
+                formatted_counter = formatted_counter + 1
+
+    if formatted_counter > 0:
+        print("Formatted %i of %i checked python files in this repo." %
+              (formatted_counter, counter))
+    else:
+        print("=" * 80)
+        print("All %i checked python files in this repo are in agreement with "
+              "autopep8." % counter)
+    return formatted_counter
+
+
+def check_python_lint(repo_root,
+                      staged_files,
+                      pylint_file,
+                      filter_pylint_stderr=False):
+    """Runs pylint on all python scripts staged for commit.
+    Return success and number of errors."""
     class TextReporterBuffer(object):
         """Stores the output produced by the pylint TextReporter."""
-
         def __init__(self):
             """init"""
             self.content = []
@@ -357,38 +476,66 @@ def check_python_lint(repo_root, staged_files, pylint_file):
             """read"""
             return self.content
 
-    # Parse each pylint output line individualy and searches
+    if filter_pylint_stderr:
+        print("Running pylint...")
+
+    # Parse each pylint output line individually and searches
     # for errors in the code.
     pylint_errors = []
     for changed_file in staged_files:
         if not os.path.isfile(changed_file):
             continue
         if re.search(r'\.py$', changed_file):
-
-            print("Running pylint on \'{}\'".format(repo_root + "/" +
-                                                    changed_file))
+            name_to_print = changed_file
+            if name_to_print[:len(repo_root)] == repo_root:
+                name_to_print = changed_file[len(repo_root) + 1:]
             pylint_output = TextReporterBuffer()
             pylint_args = [
                 "--rcfile=" + pylint_file, "-rn",
-                repo_root + "/" + changed_file
+                repo_root + "/" + name_to_print
             ]
+
+            # Prevent pylint from printing the config XX times
+            prev_stderr = sys.stderr
+            if filter_pylint_stderr:
+                stderr_buffer = StringIO()
+                sys.stderr = stderr_buffer
+
+            # Run the linter
             from pylint.reporters.text import TextReporter
             pylint.lint.Run(pylint_args,
                             reporter=TextReporter(pylint_output),
                             exit=False)
 
+            # Reset stderr and print filtered warnings.
+            sys.stderr = prev_stderr
+            if filter_pylint_stderr:
+                warnings = stderr_buffer.getvalue().splitlines()
+                for warning in warnings:
+                    if warning[:18] != 'Using config file ':
+                        sys.stderr.write(warning)
+                        sys.stderr.flush()
+
+            errors = []
             for output_line in pylint_output.read():
                 if re.search(r'^(E|C|W):', output_line):
-                    print(changed_file + ": " + output_line)
+                    errors.append(output_line)
                     pylint_errors.append(output_line)
+
+            if errors:
+                print("-" * 80)
+                print("Found {} errors in : {}".format(len(errors),
+                                                       name_to_print))
+                print("-" * 80)
+                print("\n".join(errors))
 
     if pylint_errors:
         print("=" * 80)
         print("Found {} pylint errors".format(len(pylint_errors)))
         print("=" * 80)
-        return False
+        return False, len(pylint_errors)
     else:
-        return True
+        return True, 0
 
 
 def get_whitelisted_files(repo_root, files, whitelist):
@@ -416,12 +563,13 @@ def linter_check(repo_root, linter_subfolder):
 
     # Read linter config file.
     linter_config_file = repo_root + '/.linterconfig.yaml'
+    print("=" * 80)
     if os.path.isfile(repo_root + '/.linterconfig.yaml'):
         print("Found repo linter config: {}".format(linter_config_file))
         linter_config = read_linter_config(linter_config_file)
     else:
+        print("Using default linter config.")
         linter_config = DEFAULT_CONFIG
-
 
     cpplint_file = os.path.join(linter_subfolder, "cpplint.py")
     ascii_art_file = os.path.join(linter_subfolder, "ascii_art.py")
@@ -430,7 +578,6 @@ def linter_check(repo_root, linter_subfolder):
         pylintrc_file = os.path.join(repo_root, ".pylintrc")
     else:
         pylintrc_file = os.path.join(linter_subfolder, "pylint.rc")
-
 
     print("Found linter subfolder: {}".format(linter_subfolder))
     print("Found ascii art file at: {}".format(ascii_art_file))
@@ -478,16 +625,21 @@ def linter_check(repo_root, linter_subfolder):
         # Use Google's C++ linter to check for compliance with Google style
         # guide.
         if linter_config['use_cpplint']:
-            cpp_lint_success = check_cpp_lint(whitelisted_files, cpplint_file,
-                                              ascii_art, repo_root)
+            cpp_lint_success, _ = check_cpp_lint(whitelisted_files,
+                                                 cpplint_file, ascii_art,
+                                                 repo_root)
         else:
             cpp_lint_success = True
 
-        # Use pylint to check for comimpliance with Tensofrflow python
+        # Use pylint to check for compliance with Tensorflow python
         # style guide.
         if linter_config['use_pylint']:
-            pylint_success = check_python_lint(repo_root, whitelisted_files,
-                                               pylintrc_file)
+            filter_pylint_stderr = False
+            if 'filter_pylint_stderr' in linter_config:
+                filter_pylint_stderr = linter_config['filter_pylint_stderr']
+            pylint_success, _ = check_python_lint(repo_root, whitelisted_files,
+                                                  pylintrc_file,
+                                                  filter_pylint_stderr)
         else:
             pylint_success = True
 
@@ -511,18 +663,30 @@ def linter_check(repo_root, linter_subfolder):
 
                 else:
                     exit(1)
-
         else:
-
             commit_number = get_number_of_commits(repo_root)
-            lucky_commit = ((int(commit_number) + 1) % 42 == 0)
+            lucky_commit = (int(commit_number) % 42 == 0)
+
+            # Pretty printing for the commit number
+            commit_number_text = str(commit_number)
+            if commit_number_text[-1:] == "1" \
+                    and commit_number_text[-2:] != "11":
+                commit_number_text = commit_number_text + "st"
+            elif commit_number_text[-1:] == "2" \
+                    and commit_number_text[-2:] != "12":
+                commit_number_text = commit_number_text + "nd"
+            elif commit_number_text[-1:] == "3" \
+                    and commit_number_text[-2:] != "13":
+                commit_number_text = commit_number_text + "rd"
+            else:
+                commit_number_text = commit_number_text + "th"
 
             if lucky_commit:
                 print(ascii_art.AsciiArt.story)
 
                 print("=" * 80)
-                print("Commit accepted, well done! This is your {}th commit!".
-                      format(commit_number))
+                print("Commit accepted, well done! This is your %s commit!" %
+                      commit_number_text)
                 print("This is a lucky commit! " +
                       "Please enjoy this free sheep story.")
                 print("=" * 80)
@@ -530,8 +694,113 @@ def linter_check(repo_root, linter_subfolder):
                 print(ascii_art.AsciiArt.commit_success)
 
                 print("=" * 80)
-                print("Commit accepted, well done! This is the {}th commit!".
-                      format(commit_number))
+                print("Commit accepted, well done! This is your %s commit!" %
+                      commit_number_text)
                 print("=" * 80)
     else:
         print(ascii_art.AsciiArt.homer_woohoo)
+
+
+def linter_check_all(repo_root, linter_subfolder):
+    """ Run linter check on all files in repo. """
+
+    # Read linter config file.
+    linter_config_file = repo_root + '/.linterconfig.yaml'
+    print("=" * 80)
+    if os.path.isfile(repo_root + '/.linterconfig.yaml'):
+        print("Found repo linter config: {}".format(linter_config_file))
+        linter_config = read_linter_config(linter_config_file)
+    else:
+        print("Using default linter config.")
+        linter_config = DEFAULT_CONFIG
+
+    cpplint_file = os.path.join(linter_subfolder, "cpplint.py")
+    ascii_art_file = os.path.join(linter_subfolder, "ascii_art.py")
+
+    if os.path.isfile(os.path.join(repo_root, ".pylintrc")):
+        pylintrc_file = os.path.join(repo_root, ".pylintrc")
+    else:
+        pylintrc_file = os.path.join(linter_subfolder, "pylint.rc")
+
+    print("Found linter subfolder: {}".format(linter_subfolder))
+    print("Found ascii art file at: {}".format(ascii_art_file))
+    print("Found cpplint file at: {}".format(cpplint_file))
+    print("Found pylint config file at: {}".format(pylintrc_file))
+
+    # Run checks
+    files = get_all_files(repo_root)
+
+    # Load ascii art.
+    ascii_art = imp.load_source('ascii_art', ascii_art_file)
+
+    cpp_formatted = 0
+    if linter_config['use_clangformat']:
+        cpp_formatted = run_clang_format_on_all(repo_root, files)
+
+    py_formatted = 0
+    if linter_config['use_yapf']:
+        py_formatted = run_yapf_format_on_all(repo_root, files)
+
+    # Otherwise the linter os.isfile fails when calling the linters.
+    files = [os.path.join(repo_root, f) for f in files]
+
+    # Use Google's C++ linter to check for compliance with Google style
+    # guide.
+    cpp_errors = 0
+    if linter_config['use_cpplint']:
+        print("=" * 80)
+        cpp_lint_success, cpp_errors = check_cpp_lint(files, cpplint_file,
+                                                      ascii_art, repo_root)
+        if cpp_errors == 0:
+            print("Found 0 cpplint errors.")
+            print("=" * 80)
+    else:
+        cpp_lint_success = True
+
+    # Use pylint to check for comimpliance with Tensofrflow python
+    # style guide.
+    py_errors = 0
+    print("Files:", files)
+    if linter_config['use_pylint']:
+        filter_pylint_stderr = False
+        if 'filter_pylint_stderr' in linter_config:
+            filter_pylint_stderr = linter_config['filter_pylint_stderr']
+        pylint_success, py_errors = check_python_lint(repo_root, files,
+                                                      pylintrc_file,
+                                                      filter_pylint_stderr)
+        if py_errors == 0:
+            print("=" * 80)
+            print("Found 0 pylint errors.")
+            print("=" * 80)
+    else:
+        pylint_success = True
+
+    # Summary
+    if cpp_lint_success and pylint_success:
+        print(ascii_art.AsciiArt.commit_success)
+        print("=" * 80)
+
+    n_py = len([f for f in files if f.lower().endswith('.py')])
+    n_cpp = 0
+    if linter_config['use_cpplint']:
+        n_cpp = len(files) - n_py
+    if not linter_config['use_pylint']:
+        n_py = 0
+
+    print("Summary:   %s C++ files checked."
+          "               %s python files checked.\n"
+          "           %s C++ files reformatted."
+          "           %s python files reformatted.\n"
+          "           %s C++ linter errors found."
+          "         %s python linter errors found." %
+          (str(n_cpp).ljust(3), str(n_py).ljust(3),
+           str(cpp_formatted).ljust(3), str(py_formatted).ljust(3),
+           str(cpp_errors).ljust(3), str(py_errors).ljust(3)))
+    print("=" * 80)
+
+    if not (cpp_lint_success and pylint_success):
+        print("Code not up to standards!")
+        print("Please address the linter errors above.")
+    else:
+        print("Code is up to standards, well done!")
+    print("=" * 80)
