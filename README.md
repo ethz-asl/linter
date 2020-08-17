@@ -125,7 +125,7 @@ Currently there it is not possible to configure the python formatter on a per-re
    ```
    
 ## Tools
-* **Cheking an entire repository** 
+* **Checking an entire repository** 
 
   Type `linter_check_all` to run the linters and formatters on all files within the current repository.
 
