@@ -760,7 +760,6 @@ def linter_check_all(repo_root, linter_subfolder):
     # Use pylint to check for comimpliance with Tensofrflow python
     # style guide.
     py_errors = 0
-    print("Files:", files)
     if linter_config['use_pylint']:
         filter_pylint_stderr = False
         if 'filter_pylint_stderr' in linter_config:
