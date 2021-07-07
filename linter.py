@@ -50,6 +50,12 @@ DEFAULT_CONFIG = {
 # Files containing these in name or path will not be checked by get_all_files()
 ALL_FILES_BLACKLISTED_NAMES = ['cmake-build-debug', '3rd_party', 'third_party']
 
+# Errors containing this text will be ignored for pylint
+PYLINT_IGNORE_ERRORS = [
+    "Unnecessary parens after 'print' keyword"
+    "(superfluous-parens)"
+]
+
 CPP_SUFFIXES = ['.cpp', '.cc', '.cu', '.cuh', '.h', '.hpp', '.hxx']
 
 
@@ -519,7 +525,8 @@ def check_python_lint(repo_root,
 
             errors = []
             for output_line in pylint_output.read():
-                if re.search(r'^(E|C|W):', output_line):
+                if re.search(r'^(E|C|W):', output_line) and not any(
+                        s in output_line for s in PYLINT_IGNORE_ERRORS):
                     errors.append(output_line)
                     pylint_errors.append(output_line)
 
