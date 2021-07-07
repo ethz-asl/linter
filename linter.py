@@ -39,7 +39,8 @@ DEFAULT_CONFIG = {
     'use_yapf': True,
     'use_pylint': True,
     # Block commits that don't pass by default
-    'block_commits': True,
+    'block_commits': False,
+    'allow_commits_to_master': True,
     # Check all staged files by default.
     'whitelist': [],
     # Prevents pylint from printing the config XX times.
@@ -603,9 +604,10 @@ def linter_check(repo_root, linter_subfolder):
     # Load ascii art.
     ascii_art = imp.load_source('ascii_art', ascii_art_file)
 
-    if check_commit_against_master(repo_root):
-        print(ascii_art.AsciiArt.grumpy_cat)
-        exit(1)
+    if not linter_config['allow_commits_to_master']:
+        if check_commit_against_master(repo_root):
+            print(ascii_art.AsciiArt.grumpy_cat)
+            exit(1)
 
     if not check_if_merge_commit(repo_root):
         # Do not allow commiting files that were modified after staging. This
