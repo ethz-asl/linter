@@ -12,7 +12,7 @@ of parsing the linter output.
 Set this variable to download the cpplint file instead of using the
 local !modified! copy:
 
-cpplint_url = "https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py"
+cpplint_url = "https://github.com/cpplint/cpplint/blob/develop/cpplint.py"
 
 Set this variable to use the local modified copy of the newest cpplint script:
 
@@ -43,9 +43,8 @@ CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
 def download_file_from_url(url, file_path):
     """Download a file from a HTTPS URL. Verification is enabled."""
     request = requests.get(url, verify=True, stream=True)
-    request.raw.decode_content = True
     with open(file_path, 'w') as downloaded_file:
-        shutil.copyfileobj(request.raw, downloaded_file)
+        downloaded_file.write(request.text)
 
 
 def get_git_repo_root(some_folder_in_root_repo='./'):
