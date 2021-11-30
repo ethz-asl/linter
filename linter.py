@@ -482,8 +482,10 @@ def check_python_lint(repo_root,
             print(rating[1:])
         if errors:
             print("-" * 80)
-            errors.sort(key=lambda x: int(x.split(':')[0][1:-1]))
-            print("\n".join(errors))
+            line_nos = []
+            for e in errors:
+                line_nos.append(int(e.split(':')[0][1:]))
+            print("\n".join([x for _, x in sorted(zip(line_nos, errors))]))
         num_pylint_errors += len(errors)
 
     if num_pylint_errors > 50:
