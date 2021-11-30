@@ -5,9 +5,6 @@
 # pylint : disable = C0103
 """ Pre-commit script for invoking linters and auto-formatters."""
 
-# Make sure we use the new print function
-from __future__ import print_function
-
 import datetime
 import imp
 import os
@@ -57,7 +54,7 @@ def get_user_confirmation(default=False):
     """Requests confirmation string from user"""
     sys.stdin = open('/dev/tty')
     while True:
-        resp = raw_input()
+        resp = input()
         try:
             if resp == '':
                 return default
