@@ -205,7 +205,7 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
                 if name_to_print[:len(repo_root)] == repo_root:
                     name_to_print = changed_file[len(repo_root) + 1:]
 
-                print("Found {} errors in : {}".format(error_count,
+                print("Found {} errors in: {}".format(error_count,
                                                        name_to_print))
                 print("-" * 80)
                 for line in cpplint.output:
@@ -215,7 +215,6 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
     if total_error_count > 0:
         print("=" * 80)
         print("Found {} cpplint errors".format(total_error_count))
-        print("=" * 80)
 
         if total_error_count > 50:
             print(ascii_art.AsciiArt.cthulhu)
@@ -260,7 +259,7 @@ def check_commit_against_master(repo_root):
     """Check if the current commit is intended to for the master branch."""
     current_branch = run_command_in_folder(
         "git branch | grep \"*\" | sed \"s/* //\"", repo_root)
-    print("\nCurrent_branch: {}\n".format(current_branch))
+    print("Current_branch: {}".format(current_branch))
     return current_branch == "master"
 
 
@@ -322,7 +321,6 @@ def run_clang_format(repo_root, staged_files, list_of_changed_staged_files):
         print("=" * 80)
         print("Formatted staged C++ files with clang-format.\n" +
               "Patch: {}".format(clang_format_path))
-        print("=" * 80)
     return True
 
 
@@ -487,7 +485,6 @@ def check_python_lint(repo_root,
     if num_pylint_errors > 0:
         print("=" * 80)
         print("Found {} pylint errors".format(num_pylint_errors))
-        print("=" * 80)
         return False, num_pylint_errors
     else:
         return True, 0
@@ -543,7 +540,6 @@ def linter_check(repo_root, linter_subfolder):
     staged_files = get_staged_files()
 
     if not staged_files:
-        print("\n")
         print("=" * 80)
         print("No files staged...")
         print("=" * 80)
@@ -559,7 +555,9 @@ def linter_check(repo_root, linter_subfolder):
     ascii_art = imp.load_source('ascii_art', ascii_art_file)
 
     if check_commit_against_master(repo_root):
+        print("=" * 80)
         print(ascii_art.AsciiArt.grumpy_cat)
+        print("=" * 80)
         exit(1)
 
     if not check_if_merge_commit(repo_root):
@@ -649,7 +647,9 @@ def linter_check(repo_root, linter_subfolder):
                       commit_number_text)
                 print("=" * 80)
     else:
+        print("=" * 80)
         print(ascii_art.AsciiArt.homer_woohoo)
+        print("=" * 80)
 
 
 def linter_check_all(repo_root, linter_subfolder):
@@ -699,12 +699,11 @@ def linter_check_all(repo_root, linter_subfolder):
     # guide.
     cpp_errors = 0
     if linter_config['use_cpplint']:
-        print("=" * 80)
         cpp_lint_success, cpp_errors = check_cpp_lint(files, cpplint_file,
                                                       ascii_art, repo_root)
         if cpp_errors == 0:
-            print("Found 0 cpplint errors.")
             print("=" * 80)
+            print("Found 0 cpplint errors.")
     else:
         cpp_lint_success = True
 
@@ -712,21 +711,19 @@ def linter_check_all(repo_root, linter_subfolder):
     # style guide.
     py_errors = 0
     if linter_config['use_pylint']:
-
         pylint_success, py_errors = check_python_lint(repo_root, files,
                                                       pylintrc_file
                                                       )
         if py_errors == 0:
             print("=" * 80)
             print("Found 0 pylint errors.")
-            print("=" * 80)
     else:
         pylint_success = True
 
     # Summary
     if cpp_lint_success and pylint_success:
-        print(ascii_art.AsciiArt.commit_success)
         print("=" * 80)
+        print(ascii_art.AsciiArt.commit_success)
 
     n_py = len([f for f in files if f.lower().endswith('.py')])
     n_cpp = 0
@@ -735,6 +732,7 @@ def linter_check_all(repo_root, linter_subfolder):
     if not linter_config['use_pylint']:
         n_py = 0
 
+    print("=" * 80)
     print("Summary:   %s C++ files checked."
           "               %s python files checked.\n"
           "           %s C++ files reformatted."
