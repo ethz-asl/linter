@@ -10,9 +10,6 @@ pylint: true
 # user is asked whether to proceed with the commit.
 block_commits: true
 
-# Prevents pylint from printing the config XX times.
-filter_pylint_stderr: true
-
 # If this whitelist block is present, the linter only operates on the files and
 # directories listed in this whitelist.
 whitelist:

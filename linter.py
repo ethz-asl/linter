@@ -13,8 +13,7 @@ import subprocess
 import distutils
 import sys
 
-from io import StringIO 
-import pylint.lint
+from pylint import epylint
 import yaml
 
 # Linter config.
@@ -25,11 +24,9 @@ DEFAULT_CONFIG = {
     'use_yapf': True,
     'use_pylint': True,
     # Block commits that don't pass by default
-    'block_commits': True,
+    'block_commits': False,
     # Check all staged files by default.
-    'whitelist': [],
-    # Prevents pylint from printing the config XX times.
-    'filter_pylint_stderr': True
+    'whitelist': []
 }
 
 CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
@@ -138,7 +135,8 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
     """Runs Google's cpplint on all C++ files staged for commit,
     return success and number of errors"""
     cpplint = imp.load_source('cpplint', cpplint_file)
-    cpplint._cpplint_state.SetFilters('-legal/copyright,-build/c++17')  # pylint: disable=W0212
+    cpplint._cpplint_state.SetFilters(
+        '-legal/copyright,-build/c++17')  # pylint: disable=W0212
 
     # Prevent cpplint from writing to stdout directly, instead
     # the errors will be stored in pplint.output as (line, message) tuples.
@@ -445,82 +443,52 @@ def run_yapf_format_on_all(repo_root, files):
 
 def check_python_lint(repo_root,
                       staged_files,
-                      pylint_file,
-                      filter_pylint_stderr=False):
+                      pylint_file):
     """Runs pylint on all python scripts staged for commit.
     Return success and number of errors."""
-    class TextReporterBuffer(object):
-        """Stores the output produced by the pylint TextReporter."""
-        def __init__(self):
-            """init"""
-            self.content = []
-
-        def write(self, input_str):
-            """write"""
-            self.content.append(input_str)
-
-        def read(self):
-            """read"""
-            return self.content
-
-    if filter_pylint_stderr:
-        print("Running pylint...")
 
     # Parse each pylint output line individually and searches
     # for errors in the code.
-    pylint_errors = []
+    print("Running pylint...")
+    num_pylint_errors = 0
     for changed_file in staged_files:
         if not os.path.isfile(changed_file):
             continue
-        if re.search(r'\.py$', changed_file):
-            name_to_print = changed_file
-            if name_to_print[:len(repo_root)] == repo_root:
-                name_to_print = changed_file[len(repo_root) + 1:]
-            pylint_output = TextReporterBuffer()
-            pylint_args = [
-                "--rcfile=" + pylint_file, "-rn",
-                repo_root + "/" + name_to_print
-            ]
+        if not re.search(r'\.py$', changed_file):
+            continue
+        name_to_print = changed_file
+        if name_to_print[:len(repo_root)] == repo_root:
+            name_to_print = changed_file[len(repo_root) + 1:]
+        pylint_args = changed_file + " --rcfile=" + pylint_file
 
-            # Prevent pylint from printing the config XX times
-            prev_stderr = sys.stderr
-            if filter_pylint_stderr:
-                stderr_buffer = StringIO()
-                sys.stderr = stderr_buffer
+        (pylint_stdout, _) = epylint.py_run(
+            pylint_args, return_std=True)
 
-            # Run the linter
-            from pylint.reporters.text import TextReporter
-            pylint.lint.Run(pylint_args,
-                            reporter=TextReporter(pylint_output),
-                            exit=False)
+        warnings = pylint_stdout.getvalue().splitlines()
+        errors = []
+        rating = ""
+        for w in warnings:
+            if w.startswith(" " + changed_file):
+                errors.append("L" + w[len(changed_file)+2:])
+            if w.startswith(" Your code has been rated"):
+                rating = w
 
-            # Reset stderr and print filtered warnings.
-            sys.stderr = prev_stderr
-            if filter_pylint_stderr:
-                warnings = stderr_buffer.getvalue().splitlines()
-                for warning in warnings:
-                    if warning[:18] != 'Using config file ':
-                        sys.stderr.write(warning)
-                        sys.stderr.flush()
+        # Reporting.
+        print("-" * 80)
+        print("Found {} errors in: {}".format(len(errors),
+                                              name_to_print))
+        if rating:
+            print(rating[1:])
+        if errors:
+            print("-" * 80)
+            errors = sorted(errors)
+            print("\n".join(errors))
 
-            errors = []
-            for output_line in pylint_output.read():
-                if re.search(r'^(E|C|W):', output_line):
-                    errors.append(output_line)
-                    pylint_errors.append(output_line)
-
-            if errors:
-                print("-" * 80)
-                print("Found {} errors in : {}".format(len(errors),
-                                                       name_to_print))
-                print("-" * 80)
-                print("\n".join(errors))
-
-    if pylint_errors:
+    if num_pylint_errors > 0:
         print("=" * 80)
-        print("Found {} pylint errors".format(len(pylint_errors)))
+        print("Found {} pylint errors".format(num_pylint_errors))
         print("=" * 80)
-        return False, len(pylint_errors)
+        return False, num_pylint_errors
     else:
         return True, 0
 
@@ -621,12 +589,8 @@ def linter_check(repo_root, linter_subfolder):
         # Use pylint to check for compliance with Tensorflow python
         # style guide.
         if linter_config['use_pylint']:
-            filter_pylint_stderr = False
-            if 'filter_pylint_stderr' in linter_config:
-                filter_pylint_stderr = linter_config['filter_pylint_stderr']
             pylint_success, _ = check_python_lint(repo_root, whitelisted_files,
-                                                  pylintrc_file,
-                                                  filter_pylint_stderr)
+                                                  pylintrc_file)
         else:
             pylint_success = True
 
@@ -748,12 +712,10 @@ def linter_check_all(repo_root, linter_subfolder):
     # style guide.
     py_errors = 0
     if linter_config['use_pylint']:
-        filter_pylint_stderr = False
-        if 'filter_pylint_stderr' in linter_config:
-            filter_pylint_stderr = linter_config['filter_pylint_stderr']
+
         pylint_success, py_errors = check_python_lint(repo_root, files,
-                                                      pylintrc_file,
-                                                      filter_pylint_stderr)
+                                                      pylintrc_file
+                                                      )
         if py_errors == 0:
             print("=" * 80)
             print("Found 0 pylint errors.")
