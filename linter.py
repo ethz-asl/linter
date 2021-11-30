@@ -206,7 +206,7 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
                     name_to_print = changed_file[len(repo_root) + 1:]
 
                 print("Found {} errors in: {}".format(error_count,
-                                                       name_to_print))
+                                                      name_to_print))
                 print("-" * 80)
                 for line in cpplint.output:
                     assert len(line) == 2
@@ -479,7 +479,7 @@ def check_python_lint(repo_root,
             print(rating[1:])
         if errors:
             print("-" * 80)
-            errors = sorted(errors)
+            errors.sort(key=lambda x: x.split(':')[0])
             print("\n".join(errors))
 
     if num_pylint_errors > 0:
