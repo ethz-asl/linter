@@ -2,3 +2,5 @@
 
 cpplint.py
 pylint.rc
+
+.vscode/

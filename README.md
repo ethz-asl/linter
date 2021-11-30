@@ -107,7 +107,7 @@ Currently there it is not possible to configure the python formatter on a per-re
 
    For whole file:
    ```python
-   #!/usr/bin/env python
+   #!/usr/bin/env python3
    # pylint: disable=C0103,E1101
    ...
    ```

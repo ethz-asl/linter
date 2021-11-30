@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 
@@ -15,7 +15,7 @@ def run_command_in_folder(command, folder):
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE)
     stdout, _ = run_command.communicate()
-    command_output = stdout.rstrip()
+    command_output = stdout.decode("utf-8").rstrip()
     return command_output
 
 
