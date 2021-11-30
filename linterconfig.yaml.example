@@ -1,12 +1,17 @@
+# Place this file in the root of the repo for which the linter config should be applied. If no linterconfig.yaml is found the default config will be used.
+
 # Turn the components of the linter individualy on / off.
-clangformat: on
-cpplint: on
-yapf: on
-pylint: on
+clangformat: true
+cpplint: true
+yapf: true
+pylint: true
 
 # If on, the linter blocks commits after detecting an error. Otherwise, the
 # user is asked whether to proceed with the commit.
-block_commits: on
+block_commits: true
+
+# Prevents pylint from printing the config XX times.
+filter_pylint_stderr: true
 
 # If this whitelist block is present, the linter only operates on the files and
 # directories listed in this whitelist.

@@ -20,18 +20,7 @@ from io import StringIO
 import pylint.lint
 import yaml
 
-CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
-    "clang-format-diff", "clang-format-diff-6.0", "clang-format-diff-5.0",
-    "clang-format-diff-4.0", "clang-format-diff-3.9", "clang-format-diff-3.8"
-]
-
-CLANG_FORMAT_EXECUTABLE_VERSIONS = [
-    "clang-format", "clang-format-6.0", "clang-format-5.0", "clang-format-4.0",
-    "clang-format-3.9", "clang-format-3.8"
-]
-
-YAPF_FORMAT_EXECUTABLE = "yapf"
-
+# Linter config.
 DEFAULT_CONFIG = {
     # Enable code checks and formatting by default.
     'use_clangformat': True,
@@ -45,6 +34,18 @@ DEFAULT_CONFIG = {
     # Prevents pylint from printing the config XX times.
     'filter_pylint_stderr': True
 }
+
+CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
+    "clang-format-diff", "clang-format-diff-6.0", "clang-format-diff-5.0",
+    "clang-format-diff-4.0", "clang-format-diff-3.9", "clang-format-diff-3.8"
+]
+
+CLANG_FORMAT_EXECUTABLE_VERSIONS = [
+    "clang-format", "clang-format-6.0", "clang-format-5.0", "clang-format-4.0",
+    "clang-format-3.9", "clang-format-3.8"
+]
+
+YAPF_FORMAT_EXECUTABLE = "yapf"
 
 # Files containing these in name or path will not be checked by get_all_files()
 ALL_FILES_BLACKLISTED_NAMES = ['cmake-build-debug', '3rd_party', 'third_party']
@@ -75,20 +76,9 @@ def read_linter_config(filename):
     config = DEFAULT_CONFIG
     with open(filename, 'r') as ymlfile:
         parsed_config = yaml.load(ymlfile)
-
-    if 'clangformat' in parsed_config.keys():
-        config['use_clangformat'] = parsed_config['clangformat']
-    if 'cpplint' in parsed_config.keys():
-        config['use_cpplint'] = parsed_config['cpplint']
-    if 'yapf' in parsed_config.keys():
-        config['use_yapf'] = parsed_config['yapf']
-    if 'pylint' in parsed_config.keys():
-        config['use_pylint'] = parsed_config['pylint']
-    if 'block_commits' in parsed_config.keys():
-        config['block_commits'] = parsed_config['block_commits']
-    if 'whitelist' in parsed_config.keys():
-        config['whitelist'] = parsed_config['whitelist']
-
+    for key in config.keys():
+        if key in parsed_config.keys():
+            config[key] = parsed_config[key]
     return config
 
 
