@@ -217,8 +217,10 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
         print("Found {} cpplint errors".format(total_error_count))
 
         if total_error_count > 50:
+            print("=" * 80)
             print(ascii_art.AsciiArt.cthulhu)
         elif total_error_count > 20:
+            print("=" * 80)
             print(ascii_art.AsciiArt.tiger)
         return False, total_error_count
     else:
@@ -259,6 +261,7 @@ def check_commit_against_master(repo_root):
     """Check if the current commit is intended to for the master branch."""
     current_branch = run_command_in_folder(
         "git branch | grep \"*\" | sed \"s/* //\"", repo_root)
+    print("=" * 80)
     print("Current_branch: {}".format(current_branch))
     return current_branch == "master"
 
@@ -441,7 +444,7 @@ def run_yapf_format_on_all(repo_root, files):
 
 def check_python_lint(repo_root,
                       staged_files,
-                      pylint_file):
+                      pylint_file, ascii_art):
     """Runs pylint on all python scripts staged for commit.
     Return success and number of errors."""
 
@@ -479,8 +482,16 @@ def check_python_lint(repo_root,
             print(rating[1:])
         if errors:
             print("-" * 80)
-            errors.sort(key=lambda x: x.split(':')[0])
+            errors.sort(key=lambda x: int(x.split(':')[0][1:-1]))
             print("\n".join(errors))
+        num_pylint_errors += len(errors)
+
+    if num_pylint_errors > 50:
+        print("=" * 80)
+        print(ascii_art.AsciiArt.cthulhu)
+    elif num_pylint_errors > 20:
+        print("=" * 80)
+        print(ascii_art.AsciiArt.tiger)
 
     if num_pylint_errors > 0:
         print("=" * 80)
@@ -588,7 +599,7 @@ def linter_check(repo_root, linter_subfolder):
         # style guide.
         if linter_config['use_pylint']:
             pylint_success, _ = check_python_lint(repo_root, whitelisted_files,
-                                                  pylintrc_file)
+                                                  pylintrc_file, ascii_art)
         else:
             pylint_success = True
 
@@ -609,7 +620,7 @@ def linter_check(repo_root, linter_subfolder):
 
                 if get_user_confirmation():
                     print(ascii_art.AsciiArt.yoda)
-
+                    print("=" * 80)
                 else:
                     exit(1)
         else:
@@ -631,6 +642,7 @@ def linter_check(repo_root, linter_subfolder):
                 commit_number_text = commit_number_text + "th"
 
             if lucky_commit:
+                print("=" * 80)
                 print(ascii_art.AsciiArt.story)
 
                 print("=" * 80)
@@ -640,6 +652,7 @@ def linter_check(repo_root, linter_subfolder):
                       "Please enjoy this free sheep story.")
                 print("=" * 80)
             else:
+                print("=" * 80)
                 print(ascii_art.AsciiArt.commit_success)
 
                 print("=" * 80)
@@ -712,8 +725,7 @@ def linter_check_all(repo_root, linter_subfolder):
     py_errors = 0
     if linter_config['use_pylint']:
         pylint_success, py_errors = check_python_lint(repo_root, files,
-                                                      pylintrc_file
-                                                      )
+                                                      pylintrc_file, ascii_art)
         if py_errors == 0:
             print("=" * 80)
             print("Found 0 pylint errors.")
