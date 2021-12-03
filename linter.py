@@ -46,6 +46,10 @@ ALL_FILES_BLACKLISTED_NAMES = ['cmake-build-debug', '3rd_party', 'third_party']
 
 CPP_SUFFIXES = ['.cpp', '.cc', '.cu', '.cuh', '.h', '.hpp', '.hxx']
 
+# Warnings to be ignored by cpplint.
+# cpplint can't tell system from other project headers and will warn a lot. clang-format will automaticaly sort the includes so should be fine.
+CPPLINT_FILTERS = ["legal/copyright", "build/c++11", "build/include_order"]
+
 
 def get_user_confirmation(default=False):
     """Requests confirmation string from user"""
@@ -135,8 +139,10 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
     """Runs Google's cpplint on all C++ files staged for commit,
     return success and number of errors"""
     cpplint = imp.load_source('cpplint', cpplint_file)
-    cpplint._cpplint_state.SetFilters(
-        '-legal/copyright,-build/c++17')  # pylint: disable=W0212
+
+    # Set all filters.
+    if CPPLINT_FILTERS:
+        cpplint._cpplint_state.SetFilters("-" + ",-".join(CPPLINT_FILTERS))
 
     # Prevent cpplint from writing to stdout directly, instead
     # the errors will be stored in pplint.output as (line, message) tuples.
