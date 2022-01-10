@@ -146,7 +146,7 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
 
     # Prevent cpplint from writing to stdout directly, instead
     # the errors will be stored in pplint.output as (line, message) tuples.
-    cpplint.print_stdout = False
+    cpplint._cpplint_state.SetQuiet(True)
 
     total_error_count = 0
     for changed_file in staged_files:
@@ -199,7 +199,6 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
             cpplint.output = []
             cpplint._cpplint_state.ResetErrorCounts()  # pylint: disable=W0212
             v_level = cpplint._cpplint_state.verbose_level  # pylint: disable=W0212
-
             cpplint.ProcessFile(changed_file, v_level)
 
             error_count = cpplint._cpplint_state.error_count  # pylint: disable=W0212
@@ -211,8 +210,7 @@ def check_cpp_lint(staged_files, cpplint_file, ascii_art, repo_root):
                 if name_to_print[:len(repo_root)] == repo_root:
                     name_to_print = changed_file[len(repo_root) + 1:]
 
-                print("Found {} errors in: {}".format(error_count,
-                                                      name_to_print))
+                print(f"Found {error_count} errors in: {name_to_print}")
                 print("-" * 80)
                 for line in cpplint.output:
                     assert len(line) == 2
