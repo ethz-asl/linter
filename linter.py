@@ -29,14 +29,14 @@ DEFAULT_CONFIG = {
     'whitelist': []
 }
 
+CLANG_VERSIONS = [""] + ["-%i" % i for i in range(7,13)] +  ["-6.0", "-5.0", "-4.0", "-3.9", "-3.8"]
+
 CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
-    "clang-format-diff", "clang-format-diff-6.0", "clang-format-diff-5.0",
-    "clang-format-diff-4.0", "clang-format-diff-3.9", "clang-format-diff-3.8"
+    "clang-format-diff%s" % v for v in CLANG_VERSIONS
 ]
 
 CLANG_FORMAT_EXECUTABLE_VERSIONS = [
-    "clang-format", "clang-format-6.0", "clang-format-5.0", "clang-format-4.0",
-    "clang-format-3.9", "clang-format-3.8"
+    "clang-format%s" % v for v in CLANG_VERSIONS
 ]
 
 YAPF_FORMAT_EXECUTABLE = "yapf"
