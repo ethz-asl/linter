@@ -42,8 +42,8 @@ CLANG_FORMAT_EXECUTABLE_VERSIONS = [
 
 YAPF_FORMAT_EXECUTABLE = "yapf"
 
-# Files containing these in name or path will not be checked by get_all_files()
-ALL_FILES_BLACKLISTED_NAMES = ['cmake-build-debug', '3rd_party', 'third_party']
+# Files containing these in their path will not be checked by get_all_files()
+ALL_FILES_BLACKLISTED_DIRS = ['cmake-build-debug', 'build', '3rd_party', 'third_party']
 
 CPP_SUFFIXES = ['.cpp', '.cc', '.cu', '.cuh', '.h', '.hpp', '.hxx']
 
@@ -129,8 +129,8 @@ def get_all_files(repo_root):
         for f in files:
             if f.lower().endswith(tuple(CPP_SUFFIXES + ['.py'])):
                 full_name = os.path.join(root, f)[len(repo_root) + 1:]
-                if not any(n in full_name
-                           for n in ALL_FILES_BLACKLISTED_NAMES):
+                if not any(n in os.path.dirname(full_name)
+                           for n in ALL_FILES_BLACKLISTED_DIRS):
                     output.append(full_name)
 
     return output
