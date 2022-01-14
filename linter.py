@@ -29,7 +29,8 @@ DEFAULT_CONFIG = {
     'whitelist': []
 }
 
-CLANG_VERSIONS = [""] + ["-%i" % i for i in range(7,13)] +  ["-6.0", "-5.0", "-4.0", "-3.9", "-3.8"]
+CLANG_VERSIONS = [""] + ["-%i" %
+                         i for i in range(12, 6, -1)] + ["-6.0", "-5.0", "-4.0", "-3.9", "-3.8"]
 
 CLANG_FORMAT_DIFF_EXECUTABLE_VERSIONS = [
     "clang-format-diff%s" % v for v in CLANG_VERSIONS
