@@ -18,7 +18,8 @@ def run_command_in_folder(command, folder):
                                    shell=True,
                                    cwd=folder,
                                    stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
+                                   stdout=subprocess.PIPE, 
+                                   universal_newlines=True)
     stdout, _ = run_command.communicate()
     command_output = stdout.rstrip()
     return command_output

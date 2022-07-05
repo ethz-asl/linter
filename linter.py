@@ -16,7 +16,11 @@ import subprocess
 import distutils
 import sys
 
-from cStringIO import StringIO
+if sys.version_info > (3,0):
+    from io import StringIO
+else:
+    from cStringIO import StringIO
+
 import pylint.lint
 import yaml
 
@@ -98,7 +102,8 @@ def run_command_in_folder(command, folder):
                                    shell=True,
                                    cwd=folder,
                                    stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
+                                   stdout=subprocess.PIPE,
+                                   universal_newlines=True)
     stdout, _ = run_command.communicate()
     command_output = stdout.rstrip()
     return command_output
