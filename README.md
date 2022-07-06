@@ -31,7 +31,11 @@ This repo contains a (C++, python) linter and auto formatter package that can be
      brew install clang-format
      ln -s /usr/local/share/clang/clang-format-diff.py /usr/local/bin/clang-format-diff
      ```
-
+ * **requests**
+   * Ubuntu:
+     ```
+     pip install requests
+     ``` 
 
 ## Installation
 
